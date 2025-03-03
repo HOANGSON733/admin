@@ -1,20 +1,21 @@
-"use client";
+import Link from "next/link";
+import { ArrowLeftCircle } from "lucide-react";
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { FaArrowLeft } from "react-icons/fa";
+interface BackButtonProps {
+  text: string;
+  link: string;
+}
 
-const GoBack = () => {
-    const router = useRouter();
-
-    return (
-        <Button
-            className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md"
-            onClick={() => router.back()}
-        >
-            <FaArrowLeft /> Goback
-        </Button>
-    );
+const BackButton = ({ text, link }: BackButtonProps) => {
+  return (
+    <Link
+      href={link}
+      className="text-gray-500 hover:underline flex items-center gap-1 font-bold mb-5"
+    >
+      <ArrowLeftCircle size={18} />
+      {text}
+    </Link>
+  );
 };
 
-export default GoBack;
+export default BackButton;

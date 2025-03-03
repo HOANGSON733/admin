@@ -17,7 +17,7 @@ interface PostTableProps {
     title?: string;
 }
 
-const PostTable = ({ title, limit=5 }: PostTableProps) => {
+const PostTable = ({ title, limit }: PostTableProps) => {
     const sortedPosts = [...Posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const displayedPosts = limit ? sortedPosts.slice(0, limit) : sortedPosts;
 
