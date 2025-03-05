@@ -1,13 +1,11 @@
 import {
     Command,
-    CommandDialog,
     CommandEmpty,
     CommandGroup,
     CommandInput,
     CommandItem,
     CommandList,
     CommandSeparator,
-    CommandShortcut,
 } from "@/components/ui/command"
 import { FaUser, FaCalendarAlt, FaSmile, FaCalculator, FaCreditCard, FaCog } from "react-icons/fa";
 import Link from "next/link";

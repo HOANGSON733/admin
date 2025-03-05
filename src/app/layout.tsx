@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar";
 import React from "react";
 import Sidebar from "@/components/sidebar";
-
+import { Toaster } from "@/components/ui/sonner"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,10 +36,9 @@ export default function RootLayout({
             <Sidebar />
           </div>
           <div className="p-5 w-full md:max-w-[1140px]">{children}</div>
-
         </div>
 
-
+      <Toaster />
       </body>
     </html>
   );
