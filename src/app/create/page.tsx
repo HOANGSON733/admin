@@ -8,30 +8,36 @@ import BackButton from "@/components/go-back";
 export default function CreateGallery() {
     const [name, setName] = useState("");
     const [title, setTitle] = useState("");
-    const [image, setImage] = useState("");
+    const [image, setImage] = useState<File | null>(null);
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
+    
+        // Tạo FormData
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("category", category);
+        formData.append("name", name);
 
-        const data = {
-            title,
-            image: [image], // Chuyển thành mảng chứa chuỗi
-            content: "Nội dung mẫu", // Nội dung bắt buộc
-            category: "Danh mục mẫu", // Danh mục bắt buộc
-        };
+        // Kiểm tra nếu image là file, thì thêm vào FormData
+        if (image) {
+            formData.append("image", image);
+        }
 
-        console.log("Dữ liệu gửi lên API:", data);
-
+        console.log("Dữ liệu gửi lên API:", formData);
+    
         try {
-            const response = await postData(data);
+            const response = await postData(formData);
             console.log("Phản hồi từ API:", response);
-
+    
             if (response.error) {
                 setError("Lỗi: " + response.error);
             } else {
@@ -45,11 +51,9 @@ export default function CreateGallery() {
         }
     };
 
-
     return (
-        // Thêm form vào đây
         <div>
-            <BackButton text="Back" link="/"/>
+            <BackButton text="Back" link="/" />
             <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Thêm ảnh mới</h1>
 
@@ -72,11 +76,15 @@ export default function CreateGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+                    {/* Sửa input file */}
                     <input
-                        type="text"
-                        placeholder="URL ảnh"
-                        value={image}
-                        onChange={(e) => setImage(e.target.value)}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                                setImage(e.target.files[0]);
+                            }
+                        }}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
