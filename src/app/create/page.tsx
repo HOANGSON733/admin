@@ -20,18 +20,17 @@ export default function CreateGallery() {
         setLoading(true);
         setError("");
     
-        // Tạo FormData
+        // 🟢 Dùng FormData
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
         formData.append("category", category);
         formData.append("name", name);
-
-        // Kiểm tra nếu image là file, thì thêm vào FormData
+    
         if (image) {
             formData.append("image", image);
         }
-
+    
         console.log("Dữ liệu gửi lên API:", formData);
     
         try {

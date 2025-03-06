@@ -2,81 +2,90 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getData, updateData } from "../../../lib/api";
+import { getData, updateData, uploadImage } from "../../../lib/api"; // Thêm hàm upload ảnh
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
-import { set } from "zod";
 
 export default function EditGallery() {
     const router = useRouter();
     const { id } = useParams();
-    const [name, setName] = useState<string | null>(null);
-    const [title, setTitle] = useState<string | null>(null);
-    const [image, setImage] = useState<string | null>(null);
-    const [content, setContent] = useState<string | null>(null);
-    const [category, setCategory] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [name, setName] = useState("");
+    const [title, setTitle] = useState("");
+    const [image, setImage] = useState<string | null>(null); // URL ảnh hiện tại
+    // const [newImage, setNewImage] = useState<File | null>(null); // Ảnh mới
+    const [content, setContent] = useState("");
+    const [category, setCategory] = useState("");
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
-        if (id) {
-            getData(id)
-                .then((data) => {
-                    console.log("Dữ liệu từ API:", data); // Kiểm tra dữ liệu nhận về
-                    if (data) {
-                        setName(data.name || "");
-                        setTitle(data.title || "");
-                        setImage(Array.isArray(data.image) ? data.image.join(", ") : data.image || "");
-                        setContent(data.content || "");
-                        setCategory(data.category || "");
-                    }
-                })
-                .catch((err) => {
-                    console.error("Lỗi khi tải dữ liệu:", err);
-                    setError("Không thể tải dữ liệu.");
-                });
-        }
+        if (!id) return;
+
+        getData(id)
+            .then((data) => {
+                console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu API trả về
+                if (data) {
+                    setName(data.name || "");
+                    setTitle(data.title || "");
+                    setImage(data.image || ""); // Có thể data.image bị undefined ở đây
+                    setContent(data.content || "");
+                    setCategory(data.category || "");
+                }
+            })
+            .catch((err) => {
+                console.error("Lỗi khi tải dữ liệu:", err);
+                setError("Không thể tải dữ liệu.");
+            });
+
     }, [id]);
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
-
+    
         try {
-            const updatedData = {
-                name,
-                title,
-                image: image ? image.split(",").map((url) => url.trim()) : [],
-                content,
-                category,
-            };
-
-            console.log("Dữ liệu cập nhật:", updatedData);
-
-            const response = await updateData(Number(id), updatedData);
-
-            if (response.error) {
-                setError("Lỗi: " + response.error);
-            } else {
-                router.push("/");
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("title", title);
+            formData.append("content", content);
+            formData.append("category", category);
+            
+            if (selectedFile) {
+                formData.append("image", selectedFile); // Gửi file lên API
             }
-        } catch (err) {
+    
+            const response = await fetch(`http://localhost:5000/gallery/${id}`, {
+                method: "PATCH",
+                body: formData, // Gửi form-data thay vì JSON
+            });
+    
+            const data = await response.json();
+            console.log("Response cập nhật:", data);
+    
+            if (!response.ok) {
+                throw new Error(data.message || "Lỗi khi cập nhật");
+            }
+    
+            router.push("/");
+        } catch (error) {
+            console.error("Lỗi khi cập nhật:", error);
             setError("Có lỗi xảy ra khi cập nhật.");
-            console.error(err);
         } finally {
             setLoading(false);
         }
     };
-
-    if (name === null || title === null || image === null || content === null || category === null) {
-        return <p className="text-center">Đang tải dữ liệu...</p>; // Tránh hiển thị form khi dữ liệu chưa tải xong
+    
+    if (name === null || title === null || content === null || category === null || image === null) {
+        return <p className="text-center">Đang tải dữ liệu...</p>;
     }
+
 
     return (
         <div>
-            <BackButton text="Back" link="/" />
+            <BackButton text="Quay lại" link="/" />
             <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Chỉnh sửa ảnh</h1>
 
@@ -89,7 +98,9 @@ export default function EditGallery() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        className="w-full p-2 border border-gray-300 rounded"/>
+                        className="w-full p-2 border border-gray-300 rounded"
+                    />
+
                     <input
                         type="text"
                         placeholder="Tiêu đề"
@@ -99,14 +110,18 @@ export default function EditGallery() {
                         className="w-full p-2 border border-gray-300 rounded"
                     />
 
+                    {/* Input chọn file ảnh */}
                     <input
-                        type="text"
-                        placeholder="URL ảnh (cách nhau bởi dấu phẩy)"
-                        value={image}
-                        onChange={(e) => setImage(e.target.value)}
-                        required
+                        type="file"
+                        onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+
+
+                    {/* Hiển thị ảnh cũ hoặc ảnh mới nếu chọn */}
+                    {image && (
+                        <img src={image} alt="Preview" className="w-full h-40 object-cover rounded" />
+                    )}
 
                     <textarea
                         placeholder="Nội dung"
