@@ -33,6 +33,7 @@ export default function GalleryList() {
       }
     }
   };
+// console.log(galleries);
 
   return (
     <div className="container mx-auto p-6">
