@@ -35,7 +35,7 @@ export default function RootLayout({
           <div className="hiden mb:block h-[100vh] w-[300px]">
             <Sidebar />
           </div>
-          <div className="p-5 w-full md:max-w-[1140px]">{children}</div>
+          <div className="p-5 w-full">{children}</div>
         </div>
 
       <Toaster />

@@ -23,15 +23,15 @@ export default function EditGallery() {
     useEffect(() => {
         if (!id) return;
 
-        getData(id)
+        getData()
             .then((data) => {
                 console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu API trả về
                 if (data) {
-                    setName(data.name || "");
-                    setTitle(data.title || "");
-                    setImage(data.image || ""); // Có thể data.image bị undefined ở đây
-                    setContent(data.content || "");
-                    setCategory(data.category || "");
+                    setName(data[0].name || "");
+                    setTitle(data[0].title || "");
+                    setImage(data[0].image || ""); // Có thể data[0].image bị undefined ở đây
+                    setContent(data[0].content || "");
+                    setCategory(data[0].category || "");
                 }
             })
             .catch((err) => {
