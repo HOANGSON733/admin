@@ -40,6 +40,7 @@ export default function GalleryList() {
       }
     }
   };
+// console.log(galleries);
 
   // Lọc danh sách ảnh theo từ khóa tìm kiếm
   const filteredGalleries = galleries.filter(

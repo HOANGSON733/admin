@@ -29,7 +29,11 @@ export default function EditGallery() {
                 if (data) {
                     setName(data[0].name || "");
                     setTitle(data[0].title || "");
+<<<<<<< HEAD
                     setImage(data[0].image || ""); // Có thể data[0].image bị undefined ở đây
+=======
+                    setImage(data[0].image || ""); // Có thể data.image bị undefined ở đây
+>>>>>>> f88132f6c96fac3b7db7314815649df34cd85d8d
                     setContent(data[0].content || "");
                     setCategory(data[0].category || "");
                 }
