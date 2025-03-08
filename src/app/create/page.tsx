@@ -19,24 +19,24 @@ export default function CreateGallery() {
         e.preventDefault();
         setLoading(true);
         setError("");
-    
+
         // 🟢 Dùng FormData
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
         formData.append("category", category);
         formData.append("name", name);
-    
+
         if (image) {
             formData.append("image", image);
         }
-    
+
         console.log("Dữ liệu gửi lên API:", formData);
-    
+
         try {
             const response = await postData(formData);
             console.log("Phản hồi từ API:", response);
-    
+
             if (response.error) {
                 setError("Lỗi: " + response.error);
             } else {
@@ -94,14 +94,20 @@ export default function CreateGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                    <input
-                        type="text"
-                        placeholder="Danh mục"
+                    <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
-                    />
+                    >
+                        <option value="" disabled>Chọn danh mục</option>
+                        <option value="hairstyles">Kiểu Tóc</option>
+                        <option value="services">Dịch Vụ</option>
+                        <option value="hair">Tóc Uốn</option>
+                        <option value="academy">Phun Xâm Thẩm Mỹ</option>
+                        <option value="facility">Cơ Sở Vật Chất</option>
+                        <option value="events">Sự Kiện</option>
+                    </select>
                     <button
                         type="submit"
                         disabled={loading}
