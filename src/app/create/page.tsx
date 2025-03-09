@@ -101,13 +101,14 @@ export default function CreateGallery() {
                         className="w-full p-2 border border-gray-300 rounded"
                     >
                         <option value="" disabled>Chọn danh mục</option>
-                        <option value="hairstyles">Kiểu Tóc</option>
-                        <option value="services">Dịch Vụ</option>
-                        <option value="hair">Tóc Uốn</option>
-                        <option value="academy">Phun Xâm Thẩm Mỹ</option>
-                        <option value="facility">Cơ Sở Vật Chất</option>
-                        <option value="events">Sự Kiện</option>
+                        <option value="kieu-toc">Kiểu Tóc</option>
+                        <option value="dich-vu">Dịch Vụ</option>
+                        <option value="toc-nam">Tóc Nam</option>
+                        <option value="phun-xam-tham-my">Phun Xăm Thẩm Mỹ</option>
+                        <option value="co-so-vat-chat">Cơ Sở Vật Chất</option>
+                        <option value="su-kien">Sự Kiện</option>
                     </select>
+
                     <button
                         type="submit"
                         disabled={loading}

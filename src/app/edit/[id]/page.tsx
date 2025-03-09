@@ -31,7 +31,8 @@ export default function EditGallery() {
                     setTitle(data[0].title || "");
                     setImage(data[0].image || ""); // Có thể data[0].image bị undefined ở đây
                     setContent(data[0].content || "");
-                    setCategory(data[0].category || "");
+                    setCategory(data[0].category || "" );
+                    console.log("Category nhận được:", data.category);
                 }
             })
             .catch((err) => {
@@ -130,15 +131,19 @@ export default function EditGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-
-                    <input
-                        type="text"
-                        placeholder="Danh mục"
-                        value={category}
+                    <select
+                        value={category || ""}
                         onChange={(e) => setCategory(e.target.value)}
-                        required
                         className="w-full p-2 border border-gray-300 rounded"
-                    />
+                    >
+                        <option value="" disabled>Chọn danh mục</option>
+                        <option value="kieu-toc">Kiểu Tóc</option>
+                        <option value="dich-vu">Dịch Vụ</option>
+                        <option value="toc-nam">Tóc Nam</option>
+                        <option value="phun-xam-tham-my">Phun Xăm Thẩm Mỹ</option>
+                        <option value="co-so-vat-chat">Cơ Sở Vật Chất</option>
+                        <option value="su-kien">Sự Kiện</option>
+                    </select>
 
                     <Button
                         type="submit"
