@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getData, updateData, uploadImage } from "../../../lib/api"; // Thêm hàm upload ảnh
+import { getData, updateData, uploadImage } from "@/lib/api"; // Thêm hàm upload ảnh
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
 

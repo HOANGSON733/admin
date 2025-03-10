@@ -1,4 +1,5 @@
 const API_URL = "http://localhost:5000/gallery"; // Backend NestJS
+const SERVICE_URL = "http://localhost:5000/services"; // Backend cho Service
 
 /** 
  * Lấy danh sách dữ liệu từ API 
@@ -27,6 +28,32 @@ export const getData = async () => {
 };
 
 /** 
+ * Lấy danh sách dịch vụ từ API
+ */
+export const getServices = async () => {
+    try {
+        const res = await fetch(SERVICE_URL, { cache: "no-store" });
+
+        if (!res.ok) {
+            console.error("Lỗi khi lấy dữ liệu dịch vụ:", res.status, await res.text());
+            return [];
+        }
+
+        const json = await res.json();
+
+        if (!json || typeof json !== "object" || Object.keys(json).length === 0) {
+            console.error("Dữ liệu API không hợp lệ:", json);
+            return [];
+        }
+
+        return Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+    } catch (error) {
+        console.error("Lỗi khi gọi API getServices:", error);
+        return [];
+    }
+};
+
+/** 
  * Thêm dữ liệu mới (hỗ trợ cả FormData cho ảnh)
  */
 export const postData = async (data: FormData) => {
@@ -37,6 +64,24 @@ export const postData = async (data: FormData) => {
         });
 
         if (!res.ok) throw new Error(`Lỗi khi tạo dữ liệu: ${res.status}`);
+        return await res.json();
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
+/** 
+ * Thêm dịch vụ mới
+ */
+export const postService = async (data: FormData) => {
+    try {
+        const res = await fetch(SERVICE_URL, {
+            method: "POST",
+            body: data,
+        });
+
+        if (!res.ok) throw new Error(`Lỗi khi tạo dịch vụ: ${res.status}`);
         return await res.json();
     } catch (error) {
         console.error(error);
@@ -64,6 +109,25 @@ export const updateData = async (id: number, data: any) => {
 };
 
 /** 
+ * Cập nhật dịch vụ
+ */
+export const updateService = async (id: number, data: any) => {
+    try {
+        const res = await fetch(`${SERVICE_URL}/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        });
+
+        if (!res.ok) throw new Error(`Lỗi khi cập nhật dịch vụ: ${res.status}`);
+        return await res.json();
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
+/** 
  * Xóa dữ liệu 
  */
 export const deleteData = async (id: number) => {
@@ -71,6 +135,21 @@ export const deleteData = async (id: number) => {
         const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
 
         if (!res.ok) throw new Error(`Lỗi khi xóa dữ liệu: ${res.status}`);
+        return await res.json();
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
+
+/** 
+ * Xóa dịch vụ 
+ */
+export const deleteService = async (id: number) => {
+    try {
+        const res = await fetch(`${SERVICE_URL}/${id}`, { method: "DELETE" });
+
+        if (!res.ok) throw new Error(`Lỗi khi xóa dịch vụ: ${res.status}`);
         return await res.json();
     } catch (error) {
         console.error(error);
@@ -99,7 +178,3 @@ export async function uploadImage(file: File) {
         return null;
     }
 }
-
-
-
-

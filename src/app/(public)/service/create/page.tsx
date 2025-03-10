@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { postData } from "../../lib/api";
+import { postData } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/go-back";
 
-export default function CreateGallery() {
-    const [name, setName] = useState("");
+export default function CreateService() {
+    
     const [title, setTitle] = useState("");
     const [image, setImage] = useState<File | null>(null);
     const [content, setContent] = useState("");
-    const [category, setCategory] = useState("");
+    const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
@@ -24,8 +24,8 @@ export default function CreateGallery() {
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
-        formData.append("category", category);
-        formData.append("name", name);
+        formData.append("description", description);
+
 
         if (image) {
             formData.append("image", image);
@@ -54,19 +54,11 @@ export default function CreateGallery() {
         <div>
             <BackButton text="Back" link="/" />
             <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-                <h1 className="text-xl font-bold mb-4 text-center">Thêm ảnh mới</h1>
+                <h1 className="text-xl font-bold mb-4 text-center">Thêm Dịch Vụ Mới</h1>
 
                 {error && <p className="text-red-500 text-center">{error}</p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        type="text"
-                        placeholder="Tên"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
                     <input
                         type="text"
                         placeholder="Tiêu đề"
@@ -94,20 +86,14 @@ export default function CreateGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                    <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
+                    <textarea
+                        placeholder="Mô tả"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
-                    >
-                        <option value="" disabled>Chọn danh mục</option>
-                        <option value="kieu-toc">Kiểu Tóc</option>
-                        <option value="dich-vu">Dịch Vụ</option>
-                        <option value="toc-nam">Tóc Nam</option>
-                        <option value="phun-xam-tham-my">Phun Xăm Thẩm Mỹ</option>
-                        <option value="co-so-vat-chat">Cơ Sở Vật Chất</option>
-                        <option value="su-kien">Sự Kiện</option>
-                    </select>
+                    />
+                   
 
                     <button
                         type="submit"

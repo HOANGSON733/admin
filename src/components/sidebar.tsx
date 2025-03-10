@@ -20,25 +20,25 @@ const Sidebar = () => {
                     <Link href="/">
                         <CommandItem className="cursor-pointer hover:bg-primary/10 transition-colors duration-200">
                             <FaCalendarAlt className="mr-2" />
-                            Dashboard
+                            Gallery
                         </CommandItem>
                     </Link>
                     <Link href="/post">
                         <CommandItem className="cursor-pointer hover:bg-primary/10 transition-colors duration-200">
                             <FaCalendarAlt className="mr-2" />
-                            Post Page
+                            Blog
                         </CommandItem>
                     </Link>
                     <Link href="/calendar">
                         <CommandItem className="cursor-pointer hover:bg-primary/10 transition-colors duration-200">
                             <FaCalendarAlt className="mr-2" />
-                            Calendar
+                            Product
                         </CommandItem>
                     </Link>
-                    <Link href="/emoji">
+                    <Link href="/service">
                         <CommandItem className="cursor-pointer hover:bg-primary/10 transition-colors duration-200">
                             <FaSmile className="mr-2" />
-                            Search Emoji
+                            Service
                         </CommandItem>
                     </Link>
                     <Link href="/calculator">
@@ -59,7 +59,7 @@ const Sidebar = () => {
                     <Link href="/billing">
                         <CommandItem className="cursor-pointer hover:bg-primary/10 transition-colors duration-200">
                             <FaCreditCard className="mr-2" />
-                            Billing
+                            Booking
                         </CommandItem>
                     </Link>
                     <Link href="/settings">
