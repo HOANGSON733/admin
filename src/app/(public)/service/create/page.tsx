@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { postData } from "@/lib/api";
+import { postService } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/go-back";
 
 export default function CreateService() {
-    
+
     const [title, setTitle] = useState("");
-    const [image, setImage] = useState<File | null>(null);
+    const [images, setImages] = useState<File[]>([]);
     const [content, setContent] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
@@ -19,28 +19,26 @@ export default function CreateService() {
         e.preventDefault();
         setLoading(true);
         setError("");
-
-        // 🟢 Dùng FormData
+    
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
         formData.append("description", description);
-
-
-        if (image) {
-            formData.append("image", image);
-        }
-
-        console.log("Dữ liệu gửi lên API:", formData);
-
+    
+        images.forEach((file, index) => {
+            formData.append(`image`, file);  // Gửi từng ảnh vào form
+        });
+    
+        console.log("Dữ liệu gửi lên API:", Array.from(formData.entries()));
+    
         try {
-            const response = await postData(formData);
+            const response = await postService(formData);
             console.log("Phản hồi từ API:", response);
-
+    
             if (response.error) {
                 setError("Lỗi: " + response.error);
             } else {
-                router.push("/");
+                router.push("/service");
             }
         } catch (err) {
             setError("Có lỗi xảy ra khi gửi dữ liệu.");
@@ -49,7 +47,7 @@ export default function CreateService() {
             setLoading(false);
         }
     };
-
+    
     return (
         <div>
             <BackButton text="Back" link="/" />
@@ -71,14 +69,16 @@ export default function CreateService() {
                     <input
                         type="file"
                         accept="image/*"
+                        multiple  // Cho phép chọn nhiều ảnh
                         onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                                setImage(e.target.files[0]);
+                            if (e.target.files) {
+                                setImages(Array.from(e.target.files)); // Chuyển FileList thành mảng
                             }
                         }}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+
                     <textarea
                         placeholder="Nội dung"
                         value={content}
@@ -93,7 +93,7 @@ export default function CreateService() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                   
+
 
                     <button
                         type="submit"

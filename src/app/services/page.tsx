@@ -1,10 +1,11 @@
 "use client";
 import { Image, Input, Pagination } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
-import { useState, useEffect } from "react";
+import { useState, useEffect, Key } from "react";
 import { getServices, deleteService } from "../../lib/api";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+// import { Button, Modal, Space } from 'antd';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FaPencil } from "react-icons/fa6";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -23,6 +24,8 @@ export default function ServiceList() {
       try {
         const data = await getServices();
         setServices(data);
+        console.log("Danh sách dịch vụ:", data);
+
       } catch (error) {
         console.error("Lỗi khi tải dịch vụ:", error);
       } finally {
@@ -88,6 +91,7 @@ export default function ServiceList() {
                     <TableHead>ID</TableHead>
                     <TableHead className="text-center">Thumbnail</TableHead>
                     <TableHead>Title</TableHead>
+                    <TableHead>Content</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -96,24 +100,49 @@ export default function ServiceList() {
                   {paginatedData.map((item, index) => (
                     <TableRow key={item.id}>
                       <TableCell>{(currentPage - 1) * pageSize + index + 1}</TableCell>
-                      <TableCell className="text-center">
-                        <Image 
-                          width={60} 
-                          src={item.thumbnail || "/placeholder.svg"} 
-                          alt={item.title || 'Service Thumbnail'} 
-                          style={{ borderRadius: '4px' }} 
-                        />
+                      <TableCell className="text-center gap-1">
+                        {Array.isArray(item.image) && item.image.length > 0 ? (
+                          item.image.slice(0, 2).map((img: string, index: number) => {
+                            const imageUrl = img.startsWith("http") ? img : `http://localhost:5000/uploads/${img}`;
+                            return (
+                              <Image
+                                className="px-1"
+                                key={index}
+                                width={60}
+                                src={imageUrl}
+                                alt={`Ảnh ${index + 1}`}
+                                onError={(e) => {
+                                  console.error(`Lỗi tải ảnh: ${imageUrl}`, e);
+                                  e.currentTarget.style.display = "none"; // Ẩn ảnh nếu lỗi
+                                }}
+                              />
+                            );
+                          })
+                        ) : (
+                          <p className="text-gray-500">Không có ảnh</p>
+                        )}
                       </TableCell>
                       <TableCell>{item.title}</TableCell>
                       <TableCell>
                         <TextArea
+                          value={item.content}
+                          rows={3}
+                          readOnly
+                          className="border-none bg-gray-100 cursor-default outline-none "
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextArea
                           value={item.description}
                           rows={3}
+                          readOnly
+                          className="border-none bg-gray-100 cursor-default hover:outline-none"
                         />
                       </TableCell>
 
+
                       <TableCell className="text-right">
-                        <Link href={`/edit-service/${item.id}`}>
+                        <Link href={`/service/edit/${item.id}`}>
                           <Button variant="outline" size="sm" className="mr-2">
                             <FaPencil size={16} />
                           </Button>
@@ -121,13 +150,14 @@ export default function ServiceList() {
                         <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>
                           <FaRegTrashAlt size={16} />
                         </Button>
+
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
-            
+
             <div className="flex justify-end mt-4">
               <Pagination
                 current={currentPage}
