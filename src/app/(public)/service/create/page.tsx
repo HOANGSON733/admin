@@ -38,7 +38,7 @@ export default function CreateService() {
             if (response.error) {
                 setError("Lỗi: " + response.error);
             } else {
-                router.push("/service");
+                router.push("/services");
             }
         } catch (err) {
             setError("Có lỗi xảy ra khi gửi dữ liệu.");
@@ -50,7 +50,7 @@ export default function CreateService() {
     
     return (
         <div>
-            <BackButton text="Back" link="/" />
+            <BackButton text="Back" link="/services" />
             <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Thêm Dịch Vụ Mới</h1>
 

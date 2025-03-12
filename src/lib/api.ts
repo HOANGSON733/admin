@@ -111,12 +111,26 @@ export const updateData = async (id: number, data: any) => {
 /** 
  * Cập nhật dịch vụ
  */
-export const updateService = async (id: number, data: any) => {
+/** 
+ * Cập nhật dịch vụ với tối đa 2 ảnh
+ */
+export const updateService = async (id: number, data: { title?: string; description?: string; content?: string; images?: File[] }) => {
     try {
+        const formData = new FormData();
+        if (data.title) formData.append("title", data.title);
+        if (data.description) formData.append("description", data.description);
+        if (data.content) formData.append("content", data.content);
+
+        // Chỉ thêm tối đa 2 ảnh vào FormData
+        if (data.images) {
+            data.images.slice(0, 2).forEach((file, index) => {
+                formData.append(`images`, file);
+            });
+        }
+
         const res = await fetch(`${SERVICE_URL}/${id}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
+            body: formData,
         });
 
         if (!res.ok) throw new Error(`Lỗi khi cập nhật dịch vụ: ${res.status}`);
@@ -126,6 +140,7 @@ export const updateService = async (id: number, data: any) => {
         return null;
     }
 };
+
 
 /** 
  * Xóa dữ liệu 

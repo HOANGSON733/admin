@@ -104,6 +104,7 @@ export default function ServiceList() {
                         {Array.isArray(item.image) && item.image.length > 0 ? (
                           item.image.slice(0, 2).map((img: string, index: number) => {
                             const imageUrl = img.startsWith("http") ? img : `http://localhost:5000/uploads/${img}`;
+                            // console.log("Đang tải ảnh:", imageUrl);
                             return (
                               <Image
                                 className="px-1"
@@ -113,7 +114,7 @@ export default function ServiceList() {
                                 alt={`Ảnh ${index + 1}`}
                                 onError={(e) => {
                                   console.error(`Lỗi tải ảnh: ${imageUrl}`, e);
-                                  e.currentTarget.style.display = "none"; // Ẩn ảnh nếu lỗi
+                                  e.currentTarget.style.display = "/fallback-image.jpg"; // Ẩn ảnh nếu lỗi
                                 }}
                               />
                             );

@@ -1,5 +1,5 @@
 "use client"; // Thêm nếu dùng với Next.js App Router
-
+import React from "react";
 import {
   Command,
   CommandEmpty,
@@ -35,7 +35,7 @@ const Sidebar = () => {
     { href: "/", icon: FaImages, label: "Gallery" },
     { href: "/post", icon: FaBlog, label: "Blog" },
     { href: "/calendar", icon: FaShoppingCart, label: "Product" },
-    { href: "/service", icon: FaSmile, label: "Service" },
+    { href: "/services", icon: FaSmile, label: "Service" },
     { href: "/calculator", icon: FaCalculator, label: "Calculator" },
   ];
 
@@ -62,7 +62,7 @@ const Sidebar = () => {
           className="text-sm text-gray-500 dark:text-gray-400"
         >
           {mainItems.map((item) => (
-            <Link key={item.href} href={item.href} passHref legacyBehavior>
+            <Link key={item.href} href={item.href}>
               <CommandItem
                 className={cn(
                   "cursor-pointer py-2 px-3 m-1 rounded-md",
@@ -75,6 +75,7 @@ const Sidebar = () => {
                 <span>{item.label}</span>
               </CommandItem>
             </Link>
+
           ))}
         </CommandGroup>
 
