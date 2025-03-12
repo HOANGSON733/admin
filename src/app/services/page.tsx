@@ -126,7 +126,7 @@ export default function ServiceList() {
                       <TableCell>{item.title}</TableCell>
                       <TableCell>
                         <TextArea
-                          value={item.content}
+                          value={item.content1}
                           rows={3}
                           readOnly
                           className="border-none bg-gray-100 cursor-default outline-none "
@@ -134,7 +134,7 @@ export default function ServiceList() {
                       </TableCell>
                       <TableCell>
                         <TextArea
-                          value={item.description}
+                          value={item.description1}
                           rows={3}
                           readOnly
                           className="border-none bg-gray-100 cursor-default hover:outline-none"

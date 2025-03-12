@@ -9,8 +9,8 @@ export default function CreateService() {
 
     const [title, setTitle] = useState("");
     const [images, setImages] = useState<File[]>([]);
-    const [content, setContent] = useState("");
-    const [description, setDescription] = useState("");
+    const [content1, setContent] = useState("");
+    const [description1, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
@@ -22,8 +22,8 @@ export default function CreateService() {
     
         const formData = new FormData();
         formData.append("title", title);
-        formData.append("content", content);
-        formData.append("description", description);
+        formData.append("content1", content1);
+        formData.append("description1", description1);
     
         images.forEach((file, index) => {
             formData.append(`image`, file);  // Gửi từng ảnh vào form
@@ -35,7 +35,7 @@ export default function CreateService() {
             const response = await postService(formData);
             console.log("Phản hồi từ API:", response);
     
-            if (response.error) {
+            if (response?.error) {
                 setError("Lỗi: " + response.error);
             } else {
                 router.push("/services");
@@ -66,6 +66,7 @@ export default function CreateService() {
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                     {/* Sửa input file */}
+                    <p className="block text-gray-700">Vui Lòng Chọn 2 Ảnh</p>
                     <input
                         type="file"
                         accept="image/*"
@@ -81,14 +82,14 @@ export default function CreateService() {
 
                     <textarea
                         placeholder="Nội dung"
-                        value={content}
+                        value={content1}
                         onChange={(e) => setContent(e.target.value)}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                     <textarea
                         placeholder="Mô tả"
-                        value={description}
+                        value={description1}
                         onChange={(e) => setDescription(e.target.value)}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
