@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getServices, updateService } from "@/lib/api";
+import { getServices } from "@/lib/api";
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
 
@@ -13,10 +13,11 @@ export default function EditService() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [images, setImages] = useState<string[]>([]); // Mảng URL ảnh hiện tại
-  const [content, setContent] = useState("");
-  const [description, setDescription] = useState("");
+  const [content1, setContent] = useState("");
+  const [description1, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -36,8 +37,8 @@ export default function EditService() {
           } else {
             setImages([]);
           }
-          setContent(service.content || "");
-          setDescription(service.description || "");
+          setContent(service.content1 || "");
+          setDescription(service.description1 || "");
         } else {
           setError("Không tìm thấy dịch vụ.");
         }
@@ -55,6 +56,9 @@ export default function EditService() {
     
     const newPreviewUrls = selectedFiles.map(file => URL.createObjectURL(file));
     setPreviewUrls(newPreviewUrls);
+    
+    // Đánh dấu là đang upload ảnh mới nếu có file được chọn
+    setIsUploading(selectedFiles.length > 0);
     
     // Dọn dẹp URL khi component unmounts hoặc files thay đổi
     return () => {
@@ -86,6 +90,20 @@ export default function EditService() {
     const newSelectedFiles = [...selectedFiles];
     newSelectedFiles.splice(index, 1);
     setSelectedFiles(newSelectedFiles);
+    
+    // Nếu không còn file nào, đánh dấu là không upload nữa
+    if (newSelectedFiles.length === 0) {
+      setIsUploading(false);
+    }
+  };
+
+  // Hủy việc upload ảnh mới
+  const handleCancelUpload = () => {
+    // Xóa các URL preview
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    setPreviewUrls([]);
+    setSelectedFiles([]);
+    setIsUploading(false);
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -96,16 +114,21 @@ export default function EditService() {
     try {
       const formData = new FormData();
       formData.append("title", title);
-      formData.append("content", content);
-      formData.append("description", description);
+      formData.append("content1", content1);
+      formData.append("description1", description1);
       
-      // Thêm danh sách ảnh hiện tại dưới dạng chuỗi JSON
-      formData.append("currentImages", JSON.stringify(images));
-
-      // Thêm từng file ảnh mới với tên trường "image"
-      selectedFiles.forEach((file) => {
-        formData.append("image", file);
-      });
+      // Chỉ khi không tải lên ảnh mới, gửi danh sách ảnh hiện tại
+      if (!isUploading) {
+        formData.append("currentImages", JSON.stringify(images));
+      } else {
+        // Nếu tải lên ảnh mới, thêm flag để báo hiệu server xóa ảnh cũ
+        formData.append("deleteOldImages", "true");
+        
+        // Thêm từng file ảnh mới
+        selectedFiles.forEach((file) => {
+          formData.append("image", file);
+        });
+      }
 
       console.log("Form data being sent:", Object.fromEntries(formData.entries()));
 
@@ -130,7 +153,7 @@ export default function EditService() {
     }
   };
 
-  if (!title && !content && images.length === 0 && !description) {
+  if (!title && !content1 && images.length === 0 && !description1) {
     return <p className="text-center">Đang tải dữ liệu...</p>;
   }
 
@@ -161,13 +184,28 @@ export default function EditService() {
               onChange={handleFileChange}
               className="w-full p-2 border border-gray-300 rounded"
             />
-            <p className="text-sm text-gray-500">Chọn ảnh mới để thêm vào dịch vụ</p>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                {isUploading 
+                  ? "Ảnh mới sẽ thay thế và xóa tất cả ảnh hiện tại" 
+                  : "Chọn ảnh mới để thay thế ảnh hiện tại, hoặc để trống để giữ nguyên ảnh cũ"}
+              </p>
+              {isUploading && (
+                <button
+                  type="button"
+                  onClick={handleCancelUpload}
+                  className="text-sm text-red-500 hover:text-red-700"
+                >
+                  Hủy
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Hiển thị ảnh mới đã chọn */}
-          {previewUrls.length > 0 && (
+          {isUploading && previewUrls.length > 0 && (
             <div className="mt-4">
-              <p className="text-sm font-medium mb-2">Ảnh mới:</p>
+              <p className="text-sm font-medium mb-2">Ảnh mới sẽ thay thế ảnh cũ:</p>
               <div className="grid grid-cols-2 gap-2">
                 {previewUrls.map((url, index) => (
                   <div key={`preview-${index}`} className="relative">
@@ -189,8 +227,8 @@ export default function EditService() {
             </div>
           )}
 
-          {/* Hiển thị ảnh hiện tại */}
-          {images.length > 0 && (
+          {/* Hiển thị ảnh hiện tại chỉ khi không có ảnh mới được chọn */}
+          {images.length > 0 && !isUploading && (
             <div className="mt-4">
               <p className="text-sm font-medium mb-2">Ảnh hiện tại:</p>
               <div className="grid grid-cols-2 gap-2">
@@ -216,7 +254,7 @@ export default function EditService() {
           
           <textarea
             placeholder="Nội dung"
-            value={content}
+            value={content1}
             onChange={(e) => setContent(e.target.value)}
             required
             className="w-full p-2 border border-gray-300 rounded"
@@ -224,7 +262,7 @@ export default function EditService() {
 
           <textarea
             placeholder="Mô tả"
-            value={description}
+            value={description1}
             onChange={(e) => setDescription(e.target.value)}
             required
             className="w-full p-2 border border-gray-300 rounded"

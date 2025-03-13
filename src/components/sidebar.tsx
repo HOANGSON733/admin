@@ -33,7 +33,7 @@ const Sidebar = () => {
   // Tách dữ liệu menu thành mảng để dễ quản lý
   const mainItems: SidebarItem[] = [
     { href: "/", icon: FaImages, label: "Gallery" },
-    { href: "/post", icon: FaBlog, label: "Blog" },
+    { href: "/blogs", icon: FaBlog, label: "Blog" },
     { href: "/calendar", icon: FaShoppingCart, label: "Product" },
     { href: "/services", icon: FaSmile, label: "Service" },
     { href: "/calculator", icon: FaCalculator, label: "Calculator" },

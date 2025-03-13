@@ -15,7 +15,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Admin Dashboard",
   description: "Admin dashboard built with Next.js",
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
