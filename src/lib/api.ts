@@ -91,23 +91,26 @@ export const getProducts = async () => {
         const res = await fetch(PRODUCT_URL, { cache: "no-store" });
 
         if (!res.ok) {
-            console.error("Lỗi khi lấy dữ liệu sản phẩm:", res.status, await res.text());
+            console.error("Lỗi khi lấy sản phẩm:", res.status, res.statusText);
             return [];
         }
 
-        const json = await res.json();
+        const json = await res.json().catch(() => {
+            console.error("Dữ liệu API không hợp lệ (không phải JSON)");
+            return null;
+        });
 
-        if (!json || typeof json !== "object" || Object.keys(json).length === 0) {
-            console.error("Dữ liệu API không hợp lệ:", json);
+        if (!json || !json.data || !Array.isArray(json.data)) {
+            console.error("Dữ liệu trả về không hợp lệ:", json);
             return [];
         }
 
-        return Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+        return json.data;
     } catch (error) {
         console.error("Lỗi khi gọi API getProducts:", error);
         return [];
     }
-}
+};
 /** 
  * Thêm dữ liệu mới (hỗ trợ cả FormData cho ảnh)
  */
@@ -169,19 +172,24 @@ export const postBlog = async (data: FormData) => {
  * Thêm sản phẩm mới
  */
 export const postProduct = async (data: FormData) => {
+    
     try {
         const res = await fetch(PRODUCT_URL, {
             method: "POST",
             body: data,
         });
 
-        if (!res.ok) throw new Error(`Lỗi khi tạo sản phẩm: ${res.status}`);
+        if (!res.ok) {
+            console.error("Lỗi khi tạo sản phẩm:", res.status, res.statusText);
+            return null;
+        }
+
         return await res.json();
     } catch (error) {
-        console.error(error);
+        console.error("Lỗi khi post sản phẩm:", error);
         return null;
     }
-}
+};
 
 
 /** 
@@ -296,9 +304,9 @@ export const updateProduct = async (id: number, data: { title?: string; descript
         if (data.content) formData.append("content", data.content);
 
         // Chỉ thêm tối đa 2 ảnh vào FormData
-        if (data.images) {
-            data.images.slice().forEach((file, index) => {
-                formData.append(`images`, file);
+        if (data.images?.length) {
+            data.images.slice(0, 2).forEach((file) => {
+                formData.append("images", file);
             });
         }
 
@@ -307,13 +315,17 @@ export const updateProduct = async (id: number, data: { title?: string; descript
             body: formData,
         });
 
-        if (!res.ok) throw new Error(`Lỗi khi cập nhật sản phẩm: ${res.status}`);
+        if (!res.ok) {
+            console.error("Lỗi khi cập nhật sản phẩm:", res.status, res.statusText);
+            return null;
+        }
+
         return await res.json();
     } catch (error) {
-        console.error(error);
+        console.error("Lỗi khi update sản phẩm:", error);
         return null;
     }
-}
+};
 
 
 
@@ -376,34 +388,62 @@ export const deleteProduct = async (id: number) => {
     try {
         const res = await fetch(`${PRODUCT_URL}/${id}`, { method: "DELETE" });
 
-        if (!res.ok) throw new Error(`Lỗi khi xóa sản phẩm: ${res.status}`);
+        if (!res.ok) {
+            console.error("Lỗi khi xóa sản phẩm:", res.status, res.statusText);
+            return false;
+        }
+
         return await res.json();
     } catch (error) {
-        console.error(error);
+        console.error("Lỗi khi xóa sản phẩm:", error);
         return false;
     }
-}
+};
 
 
 
 /** 
  * Tải ảnh lên server 
  */
-export async function uploadImage(file: File) {
+// export async function uploadImage(file: File) {
+//     const formData = new FormData();
+//     formData.append("image", file); // Đảm bảo key là "image"
+
+//     try {
+//         const response = await fetch("http://localhost:5000/gallery/upload", {
+//             method: "POST",
+//             body: formData,
+//         });
+
+//         const data = await response.json();
+//         console.log("Response từ API upload:", data);
+//         return data;
+//     } catch (error) {
+//         console.error("Lỗi khi upload ảnh:", error);
+//         return null;
+//     }
+// }
+/** 
+ * Tải ảnh lên server 
+ */
+export const uploadImage = async (file: File) => {
     const formData = new FormData();
-    formData.append("image", file); // Đảm bảo key là "image"
+    formData.append("image", file);
 
     try {
-        const response = await fetch("http://localhost:5000/gallery/upload", {
+        const res = await fetch("http://localhost:5000/gallery/upload", {
             method: "POST",
             body: formData,
         });
 
-        const data = await response.json();
-        console.log("Response từ API upload:", data);
-        return data;
+        if (!res.ok) {
+            console.error("Lỗi khi upload ảnh:", res.status, res.statusText);
+            return null;
+        }
+
+        return await res.json();
     } catch (error) {
         console.error("Lỗi khi upload ảnh:", error);
         return null;
     }
-}
+};

@@ -34,7 +34,7 @@ const Sidebar = () => {
   const mainItems: SidebarItem[] = [
     { href: "/", icon: FaImages, label: "Gallery" },
     { href: "/blogs", icon: FaBlog, label: "Blog" },
-    { href: "/calendar", icon: FaShoppingCart, label: "Product" },
+    { href: "/products", icon: FaShoppingCart, label: "Product" },
     { href: "/services", icon: FaSmile, label: "Service" },
     { href: "/calculator", icon: FaCalculator, label: "Calculator" },
   ];
