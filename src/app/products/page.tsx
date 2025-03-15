@@ -42,11 +42,11 @@ export default function ProductList() {
             }
         }
     };
-
     const filteredProducts = products.filter(
         (item) =>
-            item.title?.toLowerCase().includes(search.toLowerCase()) ||
-            item.description?.toLowerCase().includes(search.toLowerCase())
+            item.name?.toLowerCase().includes(search.toLowerCase()) ||
+            item.description?.toLowerCase().includes(search.toLowerCase()) ||
+            item.category?.toLowerCase().includes(search.toLowerCase())
     );
 
     const paginatedData = filteredProducts.slice(
@@ -93,7 +93,7 @@ export default function ProductList() {
                                         <TableHead>gallery</TableHead>
                                         <TableHead>category</TableHead>
                                         <TableHead>features</TableHead>
-                                        <TableHead>Description</TableHead>
+                                        <TableHead className="w-2xl">Description</TableHead>
                                         <TableHead>origin</TableHead>
                                         <TableHead>holdLevel</TableHead>
                                         <TableHead>shineLevel</TableHead>
@@ -150,12 +150,13 @@ export default function ProductList() {
                                             </TableCell>
                                             <TableCell>{item.category}</TableCell>
                                             <TableCell>{item.features}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="w-[300px]">
                                                 <TextArea
+
                                                     value={item.description}
                                                     rows={3}
                                                     readOnly
-                                                    className="border-none bg-gray-100 cursor-default hover:outline-none"
+                                                    className="border-none bg-gray-100 cursor-default hover:outline-none w-full resize-none"
                                                 />
                                             </TableCell>
                                             <TableCell>{item.origin}</TableCell>
@@ -165,7 +166,7 @@ export default function ProductList() {
                                             <TableCell>{item.expiry}</TableCell>
                                             <TableCell>{item.slug}</TableCell>
                                             <TableCell className="text-right">
-                                                <Link href={`/service/edit/${item.id}`}>
+                                                <Link href={`/product/edit/${item.id}`}>
                                                     <Button variant="outline" size="sm" className="mr-2">
                                                         <FaPencil size={16} />
                                                     </Button>

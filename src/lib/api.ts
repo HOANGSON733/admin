@@ -172,7 +172,6 @@ export const postBlog = async (data: FormData) => {
  * Thêm sản phẩm mới
  */
 export const postProduct = async (data: FormData) => {
-    
     try {
         const res = await fetch(PRODUCT_URL, {
             method: "POST",
@@ -180,14 +179,18 @@ export const postProduct = async (data: FormData) => {
         });
 
         if (!res.ok) {
-            console.error("Lỗi khi tạo sản phẩm:", res.status, res.statusText);
-            return null;
+            // Thử lấy thông tin lỗi chi tiết từ response
+            const errorData = await res.json().catch(() => ({ 
+                message: `Lỗi HTTP ${res.status}: ${res.statusText}` 
+            }));
+            console.error("Lỗi khi tạo sản phẩm:", errorData);
+            return { error: errorData.message || `Lỗi HTTP ${res.status}: ${res.statusText}` };
         }
 
         return await res.json();
     } catch (error) {
         console.error("Lỗi khi post sản phẩm:", error);
-        return null;
+        return { error: error.message || "Lỗi không xác định khi gửi dữ liệu" };
     }
 };
 
@@ -295,7 +298,14 @@ export const updateBlog = async (id: number, data: { title?: string; description
 
 /** 
  * Cập nhật sản phẩm
- */
+ * 
+ * */
+export async function getProductById(id: number) {
+    const res = await fetch(`http://localhost:5000/products/${id}`);
+    if (!res.ok) throw new Error("Lỗi khi tải sản phẩm");
+    return res.json();
+}
+
 export const updateProduct = async (id: number, data: { title?: string; description?: string; content?: string; images?: File[] }) => {
     try {
         const formData = new FormData();

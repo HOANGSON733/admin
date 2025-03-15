@@ -24,7 +24,7 @@ import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-export default function CreateProductPage() {
+export default function CreateProduct() {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -49,70 +49,87 @@ export default function CreateProductPage() {
         setGalleryFileList(info.fileList);
     };
 
-    const handleSubmit = async (values: any) => {
+    const handleSubmit = async () => {
         setLoading(true);
         setError("");
-
+        
         try {
-            // Create FormData object
+            const values = await form.validateFields();
             const formData = new FormData();
-
-            // Append basic fields
-            const excludedKeys = ['images', 'gallery', 'features', 'ingredients'];
+            
+            // Log các giá trị form trước khi gửi
+            console.log("Form values:", values);
+            
+            // Thêm dữ liệu vào formData
             Object.entries(values).forEach(([key, value]) => {
-                if (!excludedKeys.includes(key) && value !== undefined) {
-                    formData.append(key, value as string);
+                if (value !== undefined && key !== "images" && key !== "gallery") {
+                    formData.append(key, String(value));
                 }
             });
-
-            // Append images
-            fileList.forEach(file => {
-                if (file.originFileObj) {
-                    formData.append('images', file.originFileObj);
-                }
-            });
-
-            // Append gallery images
-            galleryFileList.forEach(file => {
-                if (file.originFileObj) {
-                    formData.append('gallery', file.originFileObj);
-                }
-            });
-
-            // Append features
-            features.forEach(feature => {
-                formData.append('features', feature);
-            });
-
-            // Append ingredients
-            ingredients.forEach(ingredient => {
-                formData.append('ingredients', ingredient);
-            });
-
-            console.log("Dữ liệu gửi lên API:", formData);
-
-            const response = await postProduct(formData);
-            if (!response || response.error) {
-                throw new Error(response?.error || 'Có lỗi xảy ra khi gửi dữ liệu.');
+            
+            // Thêm danh sách tính năng
+            if (features.length > 0) {
+                features.forEach(feature => {
+                    formData.append("features[]", feature);
+                });
             }
             
-            notification.success({
-                message: 'Thành công',
-                description: 'Sản phẩm đã được tạo thành công.',
-            });
+            // Thêm danh sách thành phần
+            if (ingredients.length > 0) {
+                ingredients.forEach(ingredient => {
+                    formData.append("ingredients[]", ingredient);
+                });
+            }
             
+            // Thêm hình ảnh chính
+            if (fileList.length > 0) {
+                fileList.forEach(file => {
+                    if (file.originFileObj) {
+                        formData.append("image", file.originFileObj);
+                    }
+                });
+            } else {
+                throw new Error("Vui lòng tải lên ít nhất 1 hình ảnh chính");
+            }
+            
+            // Thêm thư viện hình ảnh
+            if (galleryFileList.length > 0) {
+                galleryFileList.forEach(file => {
+                    if (file.originFileObj) {
+                        formData.append("gallery", file.originFileObj);
+                    }
+                });
+            }
+            
+            // Debug: Kiểm tra dữ liệu gửi lên API
+            console.log("Dữ liệu gửi lên API:");
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ':', pair[1]);
+            }
+            
+            // Gửi API
+            const response = await postProduct(formData);
+            console.log("Response từ API:", response);
+            
+            if (!response) {
+                throw new Error("Không nhận được phản hồi từ server");
+            }
+            
+            if (response.error) {
+                throw new Error(response.error);
+            }
+            
+            notification.success({ message: "Thành công", description: "Sản phẩm đã được tạo thành công." });
             router.push("/products");
-        } catch (err: any) {
-            console.error(err);
-            setError(err.message || 'Có lỗi xảy ra khi gửi dữ liệu.');
-            notification.error({
-                message: 'Lỗi',
-                description: err.message || 'Có lỗi xảy ra khi gửi dữ liệu.',
-            });
+        } catch (err) {
+            console.error("Lỗi chi tiết:", err);
+            setError(err.message || "Có lỗi xảy ra.");
+            notification.error({ message: "Lỗi", description: err.message || "Có lỗi xảy ra khi gửi dữ liệu." });
         } finally {
             setLoading(false);
         }
     };
+
 
     const normFile = (e: any) => {
         if (Array.isArray(e)) {
@@ -178,7 +195,7 @@ export default function CreateProductPage() {
                             </Form.Item>
 
                             <Form.Item
-                                name="oirginalPrice"
+                                name="originalPrice"
                                 label="Giá gốc"
                                 rules={[{ required: true, message: 'Vui lòng nhập giá gốc!' }]}
                                 style={{ width: '50%' }}
@@ -385,7 +402,7 @@ export default function CreateProductPage() {
                         </div>
 
                         <Form.Item>
-                        <Button type="primary" htmlType="submit" loading={loading} size="large">
+                            <Button type="primary" htmlType="submit" loading={loading} size="large">
                                 {loading ? "Đang gửi..." : "Tạo sản phẩm"}
                             </Button>
                         </Form.Item>
