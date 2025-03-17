@@ -114,6 +114,7 @@ export default function BlogList() {
                                             <TableCell>{item.name}</TableCell>
                                             <TableCell>{item.title}</TableCell>
                                             <TableCell>
+                                             <div dangerouslySetInnerHTML={{ __html: item.content }} />
                                                 <TextArea
                                                     value={item.content}
                                                     rows={3} />

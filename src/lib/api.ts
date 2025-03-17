@@ -188,7 +188,7 @@ export const postProduct = async (data: FormData) => {
         }
 
         return await res.json();
-    } catch (error) {
+    } catch (error:any) {
         console.error("Lỗi khi post sản phẩm:", error);
         return { error: error.message || "Lỗi không xác định khi gửi dữ liệu" };
     }
