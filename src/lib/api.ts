@@ -306,7 +306,7 @@ export async function getProductById(id: number) {
     return res.json();
 }
 
-export const updateProd`uct = async (id: number, data: { title?: string; description?: string; content?: string; images?: File[] }) => {
+export const updateProduct = async (id: number, data: { title?: string; description?: string; content?: string; images?: File[] }) => {
     try {
         const formData = new FormData();
         if (data.title) formData.append("title", data.title);
