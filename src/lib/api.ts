@@ -188,7 +188,7 @@ export const postProduct = async (data: FormData) => {
         }
 
         return await res.json();
-    } catch (error) {
+    } catch (error:any) {
         console.error("Lỗi khi post sản phẩm:", error);
         return { error: error.message || "Lỗi không xác định khi gửi dữ liệu" };
     }
@@ -306,7 +306,7 @@ export async function getProductById(id: number) {
     return res.json();
 }
 
-export const updateProduct = async (id: number, data: { title?: string; description?: string; content?: string; images?: File[] }) => {
+export const updateProd`uct = async (id: number, data: { title?: string; description?: string; content?: string; images?: File[] }) => {
     try {
         const formData = new FormData();
         if (data.title) formData.append("title", data.title);

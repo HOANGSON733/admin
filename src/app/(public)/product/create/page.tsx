@@ -121,7 +121,7 @@ export default function CreateProduct() {
             
             notification.success({ message: "Thành công", description: "Sản phẩm đã được tạo thành công." });
             router.push("/products");
-        } catch (err) {
+        } catch (err:any) {
             console.error("Lỗi chi tiết:", err);
             setError(err.message || "Có lỗi xảy ra.");
             notification.error({ message: "Lỗi", description: err.message || "Có lỗi xảy ra khi gửi dữ liệu." });
@@ -336,70 +336,62 @@ export default function CreateProduct() {
                         </Form.Item>
 
                         <Divider orientation="left">Tính năng</Divider>
-
-                        <div style={{ marginBottom: 16 }}>
-                            <Input
-                                placeholder="Nhập tính năng sản phẩm"
-                                value={featureInput}
-                                onChange={(e) => setFeatureInput(e.target.value)}
-                                onPressEnter={handleFeatureAdd}
-                                style={{ width: 'calc(100% - 110px)' }}
-                            />
-                            <Button
-                                type="primary"
-                                onClick={handleFeatureAdd}
-                                style={{ marginLeft: 8 }}
-                                icon={<PlusOutlined />}
+                    <Space style={{ marginBottom: 16, width: '100%' }}>
+                        <Input
+                            placeholder="Nhập tính năng sản phẩm"
+                            value={featureInput}
+                            onChange={(e) => setFeatureInput(e.target.value)}
+                            onPressEnter={handleFeatureAdd}
+                            style={{ flex: 1 }}
+                        />
+                        <Button
+                            type="primary"
+                            onClick={handleFeatureAdd}
+                            icon={<PlusOutlined />}
+                        >
+                            Thêm
+                        </Button>
+                    </Space>
+                    <Space wrap>
+                        {features.map((feature, index) => (
+                            <Tag
+                                key={index}
+                                closable
+                                onClose={() => removeFeature(index)}
                             >
-                                Thêm
-                            </Button>
-                        </div>
+                                {feature}
+                            </Tag>
+                        ))}
+                    </Space>
 
-                        <div style={{ marginBottom: 16 }}>
-                            {features.map((feature, index) => (
-                                <Tag
-                                    key={index}
-                                    closable
-                                    onClose={() => removeFeature(index)}
-                                    style={{ marginBottom: 8 }}
-                                >
-                                    {feature}
-                                </Tag>
-                            ))}
-                        </div>
-
-                        <Divider orientation="left">Thành phần</Divider>
-
-                        <div style={{ marginBottom: 16 }}>
-                            <Input
-                                placeholder="Nhập thành phần sản phẩm"
-                                value={ingredientInput}
-                                onChange={(e) => setIngredientInput(e.target.value)}
-                                onPressEnter={handleIngredientAdd}
-                                style={{ width: 'calc(100% - 110px)' }}
-                            />
-                            <Button
-                                type="primary"
-                                onClick={handleIngredientAdd}
-                                style={{ marginLeft: 8 }}
-                                icon={<PlusOutlined />}
+                    <Divider orientation="left">Thành phần</Divider>
+                    <Space style={{ marginBottom: 16, width: '100%' }}>
+                        <Input
+                            placeholder="Nhập thành phần sản phẩm"
+                            value={ingredientInput}
+                            onChange={(e) => setIngredientInput(e.target.value)}
+                            onPressEnter={handleIngredientAdd}
+                            style={{ flex: 1 }}
+                        />
+                        <Button
+                            type="primary"
+                            onClick={handleIngredientAdd}
+                            icon={<PlusOutlined />}
+                        >
+                            Thêm
+                        </Button>
+                    </Space>
+                    <Space wrap>
+                        {ingredients.map((ingredient, index) => (
+                            <Tag
+                                key={index}
+                                closable
+                                onClose={() => removeIngredient(index)}
                             >
-                                Thêm
-                            </Button>
-                        </div>
-
-                        <div style={{ marginBottom: 16 }}>
-                            {ingredients.map((ingredient, index) => (
-                                <Tag
-                                    key={index}
-                                    closable
-                                    onClose={() => removeIngredient(index)}
-                                    style={{ marginBottom: 8 }}
-                                >
-                                    {ingredient}
-                                </Tag>
-                            ))}
-                        </div>
+                                {ingredient}
+                            </Tag>
+                        ))}
+                    </Space>
 
                         <Form.Item>
                             <Button type="primary" htmlType="submit" loading={loading} size="large">

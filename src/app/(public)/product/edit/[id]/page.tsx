@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { useForm } from "react-hook-form";
 import { getProducts, updateProduct } from "@/lib/api";
 import BackButton from "@/components/go-back";
 import {
@@ -25,7 +26,13 @@ import type { UploadFile } from 'antd/es/upload/interface';
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-export default function EditProduct({ params }: { params: { id: string } }) {
+interface Params {
+    id: string;
+}
+
+export default function EditProduct({ params }: { params: Params }) {
+    const productId = params.id;
+    
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -33,27 +40,25 @@ export default function EditProduct({ params }: { params: { id: string } }) {
     const [galleryFileList, setGalleryFileList] = useState<UploadFile[]>([]);
     const [features, setFeatures] = useState<string[]>([]);
     const [ingredients, setIngredients] = useState<string[]>([]);
-    const [featureInput, setFeatureInput] = useState('');
-    const [ingredientInput, setIngredientInput] = useState('');
+    const [featureInput, setFeatureInput] = useState("");
+    const [ingredientInput, setIngredientInput] = useState("");
     const [error, setError] = useState("");
     const [productData, setProductData] = useState(null);
     const router = useRouter();
 
-    // Fetch product data
     useEffect(() => {
         const fetchProduct = async () => {
-            setInitialLoading(true);
             try {
                 const products = await getProducts();
-                const product = products.find(p => p.id === parseInt(params.id));
-                
+                const product = products.find((p: { id: number; }) => p.id === parseInt(productId));
+
                 if (!product) {
                     throw new Error("Không tìm thấy sản phẩm");
                 }
-                
+
                 setProductData(product);
-                
-                // Populate form with product data
+
+                // Populate form với dữ liệu sản phẩm
                 form.setFieldsValue({
                     name: product.name,
                     price: product.price,
@@ -66,40 +71,35 @@ export default function EditProduct({ params }: { params: { id: string } }) {
                     shineLevel: product.shineLevel,
                     expiry: product.expiry,
                 });
-                
-                // Set features and ingredients
-                if (product.features && Array.isArray(product.features)) {
-                    setFeatures(product.features);
-                }
-                
-                if (product.ingredients && Array.isArray(product.ingredients)) {
-                    setIngredients(product.ingredients);
-                }
-                
-                // Set image and gallery
+
+                // Set features và ingredients
+                if (Array.isArray(product.features)) setFeatures(product.features);
+                if (Array.isArray(product.ingredients)) setIngredients(product.ingredients);
+
+                // Set hình ảnh chính
                 if (product.image) {
                     setFileList([
                         {
-                            uid: '-1',
-                            name: 'image.jpg',
-                            status: 'done',
+                            uid: "-1",
+                            name: "image.jpg",
+                            status: "done",
                             url: product.image,
-                        }
+                        },
                     ]);
                 }
-                
-                if (product.gallery && Array.isArray(product.gallery)) {
+
+                // Set gallery ảnh
+                if (Array.isArray(product.gallery)) {
                     setGalleryFileList(
-                        product.gallery.map((url, index) => ({
+                        product.gallery.map((url:any, index:any) => ({
                             uid: `-${index + 1}`,
                             name: `gallery-${index}.jpg`,
-                            status: 'done',
+                            status: "done",
                             url: url,
                         }))
                     );
                 }
-                
-            } catch (err: any) {
+            } catch (err:any) {
                 console.error("Lỗi khi tải dữ liệu sản phẩm:", err);
                 setError(err.message || "Không thể tải dữ liệu sản phẩm");
                 notification.error({ message: "Lỗi", description: err.message || "Không thể tải dữ liệu sản phẩm" });
@@ -107,84 +107,51 @@ export default function EditProduct({ params }: { params: { id: string } }) {
                 setInitialLoading(false);
             }
         };
-        
+
         fetchProduct();
-    }, [params.id, form]);
+    }, [productId, form]);
 
-    const beforeUpload = (file: File) => {
-        // Prevent auto upload
-        return false;
-    };
-
-    const handleImageChange = (info: any) => {
-        setFileList(info.fileList);
-    };
-
-    const handleGalleryChange = (info: any) => {
-        setGalleryFileList(info.fileList);
-    };
+    const beforeUpload = (file: File) => false;
+    const handleImageChange = (info: any) => setFileList(info.fileList);
+    const handleGalleryChange = (info: any) => setGalleryFileList(info.fileList);
 
     const handleSubmit = async () => {
         setLoading(true);
         setError("");
-    
+
         try {
             const values = await form.validateFields();
             const formData = new FormData();
-    
-            // Add form data
+
             Object.entries(values).forEach(([key, value]) => {
                 if (value !== undefined && key !== "images" && key !== "gallery") {
-                    // For expiry, convert to ISO date format if it's a number
-                    if (key === "expiry" && !isNaN(Number(value))) {
-                        const expiryDate = new Date();
-                        expiryDate.setMonth(expiryDate.getMonth() + parseInt(value as string));
-                        formData.append(key, expiryDate.toISOString().split('T')[0]);
-                    } else {
-                        formData.append(key, String(value));
-                    }
+                    formData.append(key, String(value));
                 }
             });
-    
-            // Add features
-            features.forEach(feature => {
-                formData.append("features[]", feature);
+
+            // Add features & ingredients
+            features.forEach((feature) => formData.append("features[]", feature));
+            ingredients.forEach((ingredient) => formData.append("ingredients[]", ingredient));
+
+            // Add ảnh chính
+            fileList.forEach((file) => {
+                if (file.originFileObj) formData.append("image", file.originFileObj);
             });
-    
-            // Add ingredients
-            ingredients.forEach(ingredient => {
-                formData.append("ingredients[]", ingredient);
+
+            // Add ảnh gallery
+            galleryFileList.forEach((file) => {
+                if (file.originFileObj) formData.append("gallery[]", file.originFileObj);
             });
-    
-            // Add main image (only append new files)
-            fileList.forEach(file => {
-                if (file.originFileObj) {
-                    formData.append("image", file.originFileObj);
-                }
-            });
-    
-            // Add gallery images (only append new files)
-            galleryFileList.forEach(file => {
-                if (file.originFileObj) {
-                    formData.append("gallery[]", file.originFileObj);
-                }
-            });
-    
-            // Debug: Log data being sent to API
-            console.log("Dữ liệu gửi lên API:");
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ':', pair[1]);
-            }
-    
-            // Send update request
-            const response = await updateProduct(parseInt(params.id), formData);
+
+            // Gửi dữ liệu cập nhật
+            const response = await updateProduct(parseInt(productId), formData as any);
             if (!response || response.error) {
                 throw new Error(response?.error || "Có lỗi xảy ra khi cập nhật dữ liệu.");
             }
-    
+
             notification.success({ message: "Thành công", description: "Sản phẩm đã được cập nhật thành công." });
             router.push("/products");
-        } catch (err: any) {
+        } catch (err:any) {
             console.error(err);
             setError(err.message || "Có lỗi xảy ra.");
             notification.error({ message: "Lỗi", description: err.message || "Có lỗi xảy ra khi cập nhật dữ liệu." });
@@ -195,32 +162,31 @@ export default function EditProduct({ params }: { params: { id: string } }) {
 
     const handleFeatureAdd = useCallback(() => {
         if (!featureInput.trim()) return;
-        setFeatures(prev => [...prev, featureInput]);
-        setFeatureInput('');
+        setFeatures((prev) => [...prev, featureInput]);
+        setFeatureInput("");
     }, [featureInput]);
 
     const handleIngredientAdd = useCallback(() => {
         if (!ingredientInput.trim()) return;
-        setIngredients(prev => [...prev, ingredientInput]);
-        setIngredientInput('');
+        setIngredients((prev) => [...prev, ingredientInput]);
+        setIngredientInput("");
     }, [ingredientInput]);
 
     const removeFeature = useCallback((index: number) => {
-        setFeatures(prev => prev.filter((_, i) => i !== index));
+        setFeatures((prev) => prev.filter((_, i) => i !== index));
     }, []);
 
     const removeIngredient = useCallback((index: number) => {
-        setIngredients(prev => prev.filter((_, i) => i !== index));
+        setIngredients((prev) => prev.filter((_, i) => i !== index));
     }, []);
 
     if (initialLoading) {
         return (
-            <div style={{ padding: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+            <div style={{ padding: "24px", display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
                 <Spin size="large" tip="Đang tải dữ liệu..." />
             </div>
         );
     }
-
     return (
         <div style={{ padding: '24px' }}>
             <Space direction="vertical" style={{ width: '100%' }}>
@@ -356,8 +322,6 @@ export default function EditProduct({ params }: { params: { id: string } }) {
 
                         <Divider orientation="left">Hình ảnh sản phẩm</Divider>
 
-                        
-
                         <Form.Item
                             name="gallery"
                             label="Thư viện ảnh"
@@ -389,7 +353,7 @@ export default function EditProduct({ params }: { params: { id: string } }) {
                         <Space>
                             <Input
                                 value={featureInput}
-                                onChange={e => setFeatureInput(e.target.value)}
+                                onChange={e => setFeatureInput(e.target.value)}                             
                                 placeholder="Nhập đặc điểm nổi bật"
                             />
                             <Button onClick={handleFeatureAdd}>Thêm</Button>
