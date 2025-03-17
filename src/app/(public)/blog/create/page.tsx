@@ -1,9 +1,12 @@
 "use client";
-
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
 import { postBlog } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/go-back";
+
+// 🟢 Load Tiptap không SSR
+const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), { ssr: false });
 
 export default function CreateBlog() {
     const [name, setName] = useState("");
@@ -15,12 +18,17 @@ export default function CreateBlog() {
     const [error, setError] = useState("");
     const router = useRouter();
 
+    // 🟢 Đặt nội dung sau khi render để tránh lỗi SSR
+    useEffect(() => {
+        setContent("<p>Nhập nội dung...</p>");
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
 
-        // 🟢 Dùng FormData
+        // 🟢 Dùng FormData để gửi API
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
@@ -53,7 +61,7 @@ export default function CreateBlog() {
     return (
         <div>
             <BackButton text="Back" link="/blogs" />
-            <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+            <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Thêm Blog Mới</h1>
 
                 {error && <p className="text-red-500 text-center">{error}</p>}
@@ -75,7 +83,8 @@ export default function CreateBlog() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                    {/* Sửa input file */}
+                    
+                    {/* 🟢 Input chọn ảnh */}
                     <input
                         type="file"
                         accept="image/*"
@@ -84,16 +93,13 @@ export default function CreateBlog() {
                                 setImage(e.target.files[0]);
                             }
                         }}
-                        required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                    <textarea
-                        placeholder="Nội dung"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
+
+                    {/* 🟢 Tiptap Editor */}
+                    <TiptapEditor content={content} setContent={setContent} />
+
+                    {/* 🟢 Mô tả blog */}
                     <textarea
                         placeholder="Mô tả"
                         value={description}
@@ -101,12 +107,14 @@ export default function CreateBlog() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+                    
+                    {/* 🟢 Nút Submit */}
                     <button
                         type="submit"
                         disabled={loading}
                         className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded"
                     >
-                        {loading ? "Đang thêm..." : "Thêm ảnh"}
+                        {loading ? "Đang thêm..." : "Thêm Blog"}
                     </button>
                 </form>
             </div>

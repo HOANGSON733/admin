@@ -1,10 +1,13 @@
 "use client";
+import dynamic from "next/dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getBlogs, updateBlog, uploadImage } from "@/lib/api"; // Thêm hàm upload ảnh
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
+
+const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), { ssr: false });
 
 export default function EditBlog() {
     const router = useRouter();
@@ -86,7 +89,7 @@ export default function EditBlog() {
     return (
         <div>
             <BackButton text="Quay lại" link="/blogs" />
-            <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+            <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Chỉnh sửa ảnh</h1>
 
                 {error && <p className="text-red-500 text-center">{error}</p>}
@@ -120,16 +123,17 @@ export default function EditBlog() {
 
                     {/* Hiển thị ảnh cũ hoặc ảnh mới nếu chọn */}
                     {image && (
-                        <img src={image} alt="Preview" className="w-full h-40 object-cover rounded" />
+                        <img src={image} alt="Preview" className="w-full h-90 object-cover rounded" />
                     )}
-
-                    <textarea
+                         {/* 🟢 Tiptap Editor */}
+                    <TiptapEditor content={content} setContent={setContent} />
+                    {/* <textarea
                         placeholder="Nội dung"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
-                    />
+                    /> */}
                     <textarea
                         placeholder="Mô tả"
                         value={description}
