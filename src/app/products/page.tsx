@@ -88,21 +88,22 @@ export default function ProductList() {
                                         <TableHead>ID</TableHead>
                                         <TableHead className="text-center">Image</TableHead>
                                         <TableHead>Name</TableHead>
-                                        <TableHead>price</TableHead>
-                                        <TableHead>originalPrice</TableHead>
-                                        <TableHead>gallery</TableHead>
-                                        <TableHead>category</TableHead>
-                                        <TableHead>features</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead>Original Price</TableHead>
+                                        <TableHead>Gallery</TableHead>
+                                        <TableHead>Category</TableHead>
+                                        <TableHead>Features</TableHead>
                                         <TableHead className="w-2xl">Description</TableHead>
-                                        <TableHead>origin</TableHead>
-                                        <TableHead>holdLevel</TableHead>
-                                        <TableHead>shineLevel</TableHead>
-                                        <TableHead>ingredients</TableHead>
-                                        <TableHead>expiry</TableHead>
-                                        <TableHead>slug</TableHead>
+                                        <TableHead>Origin</TableHead>
+                                        <TableHead>Hold Level</TableHead>
+                                        <TableHead>Shine Level</TableHead>
+                                        <TableHead>Ingredients</TableHead>
+                                        <TableHead>Expiry</TableHead>
+                                        <TableHead>Slug</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
+
                                 <TableBody>
                                     {paginatedData.map((item, index) => (
                                         <TableRow key={item.id}>
@@ -149,7 +150,7 @@ export default function ProductList() {
                                                 )}
                                             </TableCell>
                                             <TableCell>{item.category}</TableCell>
-                                            <TableCell>{item.features}</TableCell>
+                                            <TableCell>{JSON.stringify(item.features)}</TableCell>
                                             <TableCell className="w-[300px]">
                                                 <TextArea
 
@@ -162,7 +163,7 @@ export default function ProductList() {
                                             <TableCell>{item.origin}</TableCell>
                                             <TableCell>{item.holdLevel}</TableCell>
                                             <TableCell>{item.shineLevel}</TableCell>
-                                            <TableCell>{item.ingredients}</TableCell>
+                                            <TableCell>{JSON.stringify(item.ingredients)}</TableCell>
                                             <TableCell>{item.expiry}</TableCell>
                                             <TableCell>{item.slug}</TableCell>
                                             <TableCell className="text-right">
