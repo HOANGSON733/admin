@@ -99,6 +99,7 @@ export default function ProductList() {
                                         <TableHead>Shine Level</TableHead>
                                         <TableHead>Ingredients</TableHead>
                                         <TableHead>Expiry</TableHead>
+                                        <TableHead>Usage</TableHead>
                                         <TableHead>Slug</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
@@ -165,6 +166,7 @@ export default function ProductList() {
                                             <TableCell>{item.shineLevel}</TableCell>
                                             <TableCell>{JSON.stringify(item.ingredients)}</TableCell>
                                             <TableCell>{item.expiry}</TableCell>
+                                            <TableCell>{item.usage}</TableCell>
                                             <TableCell>{item.slug}</TableCell>
                                             <TableCell className="text-right">
                                                 <Link href={`/product/edit/${item.id}`}>

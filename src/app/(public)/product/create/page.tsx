@@ -216,11 +216,12 @@ export default function CreateProduct() {
                             rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
                         >
                             <Select placeholder="Chọn danh mục">
-                                <Select.Option value="hair_wax">Sáp vuốt tóc</Select.Option>
-                                <Select.Option value="hair_clay">Đất sét tạo kiểu tóc</Select.Option>
-                                <Select.Option value="hair_paste">Paste tạo kiểu tóc</Select.Option>
-                                <Select.Option value="pomade">Pomade</Select.Option>
-                                <Select.Option value="other">Khác</Select.Option>
+                                <Select.Option value="Sáp vuốt tóc">Sáp vuốt tóc</Select.Option>
+                                <Select.Option value="Đất sét tạo kiểu tóc">Đất sét tạo kiểu tóc</Select.Option>
+                                <Select.Option value="Paste tạo kiểu tóc">Paste tạo kiểu tóc</Select.Option>
+                                <Select.Option value="Pomade">Pomade</Select.Option>
+                                <Select.Option value="Tinh dầu">Tinh dầu</Select.Option>
+                                <Select.Option value="Khác">Khác</Select.Option>
                             </Select>
                         </Form.Item>
 
@@ -241,7 +242,7 @@ export default function CreateProduct() {
                                     label="Trọng lượng"
                                     rules={[{ required: true, message: 'Vui lòng nhập trọng lượng!' }]}
                                 >
-                                    <Input placeholder="Ví dụ: 100g" />
+                                    <Input placeholder="Ví dụ: 100g hoặc 100ml" />
                                 </Form.Item>
                             </Col>
 
@@ -264,10 +265,10 @@ export default function CreateProduct() {
                                     rules={[{ required: true, message: 'Vui lòng nhập độ giữ nếp!' }]}
                                 >
                                     <Select placeholder="Chọn độ giữ nếp">
-                                        <Select.Option value="weak">Yếu</Select.Option>
-                                        <Select.Option value="medium">Trung bình</Select.Option>
-                                        <Select.Option value="strong">Mạnh</Select.Option>
-                                        <Select.Option value="very_strong">Rất mạnh</Select.Option>
+                                        <Select.Option value="Yếu">Yếu</Select.Option>
+                                        <Select.Option value="Trung bình">Trung bình</Select.Option>
+                                        <Select.Option value="Mạnh">Mạnh</Select.Option>
+                                        <Select.Option value="Rất mạnh">Rất mạnh</Select.Option>
                                     </Select>
                                 </Form.Item>
                             </Col>
@@ -279,10 +280,10 @@ export default function CreateProduct() {
                                     rules={[{ required: true, message: 'Vui lòng nhập độ bóng!' }]}
                                 >
                                     <Select placeholder="Chọn độ bóng">
-                                        <Select.Option value="matte">Lì</Select.Option>
-                                        <Select.Option value="low_shine">Ánh nhẹ</Select.Option>
-                                        <Select.Option value="medium_shine">Bóng vừa</Select.Option>
-                                        <Select.Option value="high_shine">Rất bóng</Select.Option>
+                                        <Select.Option value="Lì">Lì</Select.Option>
+                                        <Select.Option value="Ánh nhẹ">Ánh nhẹ</Select.Option>
+                                        <Select.Option value="Bóng vừa">Bóng vừa</Select.Option>
+                                        <Select.Option value="Rất bóng">Rất bóng</Select.Option>
                                     </Select>
                                 </Form.Item>
                             </Col>
@@ -294,7 +295,7 @@ export default function CreateProduct() {
                             label="Hạn sử dụng"
                             rules={[{ required: true, message: 'Vui lòng nhập hạn sử dụng!' }]}
                         >
-                            <Input placeholder="Ví dụ: 36 tháng kể từ ngày sản xuất" />
+                            <Input placeholder="Ví dụ: 2025-03-03" />
                         </Form.Item>
 
                         <Divider orientation="left">Hình ảnh sản phẩm</Divider>
@@ -340,6 +341,14 @@ export default function CreateProduct() {
                                 </div>
                             </Upload>
 
+                        </Form.Item>
+                        
+                        <Form.Item
+                            name="usage"
+                            label="Hướng dẫn sử dụng"
+                            rules={[{ required: true, message: 'Vui lòng nhập hướng dẫn sử dụng!' }]}
+                        >
+                            <Input placeholder="Nhập hướng dẫn sử dụng" />
                         </Form.Item>
 
                         <Divider orientation="left">Tính năng</Divider>
