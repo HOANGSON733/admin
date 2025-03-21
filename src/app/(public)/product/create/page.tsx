@@ -30,10 +30,8 @@ export default function CreateProduct() {
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [galleryFileList, setGalleryFileList] = useState<UploadFile[]>([]);
-    const [features, setFeatures] = useState<string[]>([]);
-    const [ingredients, setIngredients] = useState<string[]>([]);
-    const [featureInput, setFeatureInput] = useState('');
-    const [ingredientInput, setIngredientInput] = useState('');
+    const [features, setFeatures] = useState<string>("");
+    const [ingredients, setIngredients] = useState<string>('');
     const [error, setError] = useState("");
     const router = useRouter();
 
@@ -69,17 +67,12 @@ export default function CreateProduct() {
             });
 
             // Thêm danh sách tính năng
-            if (features.length > 0) {
-                features.forEach(feature => {
-                    formData.append("features[]", feature);
-                });
+            if (Array.isArray(features)) {
+                formData.append("features", features.join(", "));
             }
-
-            // Thêm danh sách thành phần
-            if (ingredients.length > 0) {
-                ingredients.forEach(ingredient => {
-                    formData.append("ingredients[]", ingredient);
-                });
+            
+            if (Array.isArray(ingredients)) {
+                formData.append("ingredients", ingredients.join(", "));
             }
 
             // Thêm hình ảnh chính
@@ -138,26 +131,6 @@ export default function CreateProduct() {
         }
         return e?.fileList;
     };
-
-    const handleFeatureAdd = useCallback(() => {
-        if (!featureInput.trim()) return;
-        setFeatures(prev => [...prev, featureInput]);
-        setFeatureInput('');
-    }, [featureInput]);
-
-    const handleIngredientAdd = useCallback(() => {
-        if (!ingredientInput.trim()) return;
-        setIngredients(prev => [...prev, ingredientInput]);
-        setIngredientInput('');
-    }, [ingredientInput]);
-
-    const removeFeature = useCallback((index: number) => {
-        setFeatures(prev => prev.filter((_, i) => i !== index));
-    }, []);
-
-    const removeIngredient = useCallback((index: number) => {
-        setIngredients(prev => prev.filter((_, i) => i !== index));
-    }, []);
 
     return (
         <div style={{ padding: '24px' }}>
@@ -342,7 +315,7 @@ export default function CreateProduct() {
                             </Upload>
 
                         </Form.Item>
-                        
+
                         <Form.Item
                             name="usage"
                             label="Hướng dẫn sử dụng"
@@ -351,63 +324,31 @@ export default function CreateProduct() {
                             <Input placeholder="Nhập hướng dẫn sử dụng" />
                         </Form.Item>
 
-                        <Divider orientation="left">Tính năng</Divider>
-                        <Space style={{ marginBottom: 16, width: '100%' }}>
-                            <Input
+                        <Form.Item
+                            name="features"
+                            label="Tính năng"
+                            rules={[{ required: true, message: 'Vui lòng nhập tính năng sản phẩm!' }]}
+                        >
+                            <TextArea
+                                rows={3}
                                 placeholder="Nhập tính năng sản phẩm"
-                                value={featureInput}
-                                onChange={(e) => setFeatureInput(e.target.value)}
-                                onPressEnter={handleFeatureAdd}
-                                style={{ flex: 1 }}
+                                value={features}
+                                onChange={(e) => setFeatures(e.target.value)}
                             />
-                            <Button
-                                type="primary"
-                                onClick={handleFeatureAdd}
-                                icon={<PlusOutlined />}
-                            >
-                                Thêm
-                            </Button>
-                        </Space>
-                        <Space wrap>
-                            {features.map((feature, index) => (
-                                <Tag
-                                    key={index}
-                                    closable
-                                    onClose={() => removeFeature(index)}
-                                >
-                                    {feature}
-                                </Tag>
-                            ))}
-                        </Space>
+                        </Form.Item>
 
-                        <Divider orientation="left">Thành phần</Divider>
-                        <Space style={{ marginBottom: 16, width: '100%' }}>
-                            <Input
+                        <Form.Item
+                            name="ingredients"
+                            label="Thành phần"
+                            rules={[{ required: true, message: 'Vui lòng nhập thành phần sản phẩm!' }]}
+                        >
+                            <TextArea
+                                rows={3}
                                 placeholder="Nhập thành phần sản phẩm"
-                                value={ingredientInput}
-                                onChange={(e) => setIngredientInput(e.target.value)}
-                                onPressEnter={handleIngredientAdd}
-                                style={{ flex: 1 }}
+                                value={ingredients}
+                                onChange={(e) => setIngredients(e.target.value)}
                             />
-                            <Button
-                                type="primary"
-                                onClick={handleIngredientAdd}
-                                icon={<PlusOutlined />}
-                            >
-                                Thêm
-                            </Button>
-                        </Space>
-                        <Space wrap>
-                            {ingredients.map((ingredient, index) => (
-                                <Tag
-                                    key={index}
-                                    closable
-                                    onClose={() => removeIngredient(index)}
-                                >
-                                    {ingredient}
-                                </Tag>
-                            ))}
-                        </Space>
+                        </Form.Item>
 
                         <Form.Item>
                             <Button type="primary" htmlType="submit" loading={loading} size="large">

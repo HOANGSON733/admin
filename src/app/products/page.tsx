@@ -151,7 +151,7 @@ export default function ProductList() {
                                                 )}
                                             </TableCell>
                                             <TableCell>{item.category}</TableCell>
-                                            <TableCell>{JSON.stringify(item.features)}</TableCell>
+                                            <TableCell>{item.features}</TableCell>
                                             <TableCell className="w-[300px]">
                                                 <TextArea
 
@@ -164,7 +164,7 @@ export default function ProductList() {
                                             <TableCell>{item.origin}</TableCell>
                                             <TableCell>{item.holdLevel}</TableCell>
                                             <TableCell>{item.shineLevel}</TableCell>
-                                            <TableCell>{JSON.stringify(item.ingredients)}</TableCell>
+                                            <TableCell>{item.ingredients}</TableCell>
                                             <TableCell>{item.expiry}</TableCell>
                                             <TableCell>{item.usage}</TableCell>
                                             <TableCell>{item.slug}</TableCell>
