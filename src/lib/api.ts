@@ -306,21 +306,31 @@ export async function getProductById(id: number) {
     return res.json();
 }
 
-export const updateProduct = async (id: number, data: { title?: string; description?: string; content?: string; images?: File[] }) => {
+export const updateProduct = async (
+    
+    id: number,
+    data: { title?: string; description?: string; content?: string; images?: File[]; gallery?: File[] }
+) => {
     try {
         const formData = new FormData();
+
         if (data.title) formData.append("title", data.title);
         if (data.description) formData.append("description", data.description);
         if (data.content) formData.append("content", data.content);
 
-        // Chỉ thêm tối đa 2 ảnh vào FormData
+        // Chỉ thêm 1 ảnh vào "image"
         if (data.images?.length) {
-            data.images.slice(0, 2).forEach((file) => {
-                formData.append("images", file);
+            formData.append("image", data.images[0]); // Backend nhận "image", không phải "images"
+        }
+
+        // Thêm nhiều ảnh vào "gallery"
+        if (data.gallery?.length) {
+            data.gallery.forEach((file) => {
+                formData.append("gallery", file); // Đúng tên field backend đang nhận
             });
         }
 
-        const res = await fetch(`${PRODUCT_URL}/${id}`, {
+        const res = await fetch(`http://localhost:5000/products/${id}`, {
             method: "PATCH",
             body: formData,
         });
@@ -336,6 +346,7 @@ export const updateProduct = async (id: number, data: { title?: string; descript
         return null;
     }
 };
+
 
 
 

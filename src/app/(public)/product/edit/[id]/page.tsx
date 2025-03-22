@@ -1,8 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
-import { useForm } from "react-hook-form";
 import { getProducts, updateProduct } from "@/lib/api";
 import BackButton from "@/components/go-back";
 import {
@@ -17,10 +15,12 @@ import {
     Divider,
     Card,
     notification,
-    Tag,
-    Spin
+    Spin,
+    Row,
+    Col
+
 } from 'antd';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
 
 const { Title, Text } = Typography;
@@ -32,16 +32,15 @@ interface Params {
 
 export default function EditProduct({ params }: { params: Params }) {
     const productId = params.id;
-    
+
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [image, setImage] = useState<string>("");
     const [galleryFileList, setGalleryFileList] = useState<UploadFile[]>([]);
-    const [features, setFeatures] = useState<string[]>([]);
-    const [ingredients, setIngredients] = useState<string[]>([]);
-    const [featureInput, setFeatureInput] = useState("");
-    const [ingredientInput, setIngredientInput] = useState("");
+    const [features] = useState<string>("");
+    const [ingredients] = useState<string>("");
     const [error, setError] = useState("");
     const [productData, setProductData] = useState(null);
     const router = useRouter();
@@ -51,7 +50,8 @@ export default function EditProduct({ params }: { params: Params }) {
             try {
                 const products = await getProducts();
                 const product = products.find((p: { id: number; }) => p.id === parseInt(productId));
-
+                console.log("Product data:", product);
+                
                 if (!product) {
                     throw new Error("Không tìm thấy sản phẩm");
                 }
@@ -70,11 +70,10 @@ export default function EditProduct({ params }: { params: Params }) {
                     holdLevel: product.holdLevel,
                     shineLevel: product.shineLevel,
                     expiry: product.expiry,
+                    usage: product.usage,
+                    features: product.features,
+                    ingredients: product.ingredients,
                 });
-
-                // Set features và ingredients
-                if (Array.isArray(product.features)) setFeatures(product.features);
-                if (Array.isArray(product.ingredients)) setIngredients(product.ingredients);
 
                 // Set hình ảnh chính
                 if (product.image) {
@@ -91,7 +90,7 @@ export default function EditProduct({ params }: { params: Params }) {
                 // Set gallery ảnh
                 if (Array.isArray(product.gallery)) {
                     setGalleryFileList(
-                        product.gallery.map((url:any, index:any) => ({
+                        product.gallery.map((url: string, index: number) => ({
                             uid: `-${index + 1}`,
                             name: `gallery-${index}.jpg`,
                             status: "done",
@@ -99,7 +98,8 @@ export default function EditProduct({ params }: { params: Params }) {
                         }))
                     );
                 }
-            } catch (err:any) {
+
+            } catch (err: any) {
                 console.error("Lỗi khi tải dữ liệu sản phẩm:", err);
                 setError(err.message || "Không thể tải dữ liệu sản phẩm");
                 notification.error({ message: "Lỗi", description: err.message || "Không thể tải dữ liệu sản phẩm" });
@@ -110,6 +110,7 @@ export default function EditProduct({ params }: { params: Params }) {
 
         fetchProduct();
     }, [productId, form]);
+
 
     const beforeUpload = (file: File) => false;
     const handleImageChange = (info: any) => setFileList(info.fileList);
@@ -130,8 +131,6 @@ export default function EditProduct({ params }: { params: Params }) {
             });
 
             // Add features & ingredients
-            features.forEach((feature) => formData.append("features[]", feature));
-            ingredients.forEach((ingredient) => formData.append("ingredients[]", ingredient));
 
             // Add ảnh chính
             fileList.forEach((file) => {
@@ -151,7 +150,7 @@ export default function EditProduct({ params }: { params: Params }) {
 
             notification.success({ message: "Thành công", description: "Sản phẩm đã được cập nhật thành công." });
             router.push("/products");
-        } catch (err:any) {
+        } catch (err: any) {
             console.error(err);
             setError(err.message || "Có lỗi xảy ra.");
             notification.error({ message: "Lỗi", description: err.message || "Có lỗi xảy ra khi cập nhật dữ liệu." });
@@ -159,26 +158,6 @@ export default function EditProduct({ params }: { params: Params }) {
             setLoading(false);
         }
     };
-
-    const handleFeatureAdd = useCallback(() => {
-        if (!featureInput.trim()) return;
-        setFeatures((prev) => [...prev, featureInput]);
-        setFeatureInput("");
-    }, [featureInput]);
-
-    const handleIngredientAdd = useCallback(() => {
-        if (!ingredientInput.trim()) return;
-        setIngredients((prev) => [...prev, ingredientInput]);
-        setIngredientInput("");
-    }, [ingredientInput]);
-
-    const removeFeature = useCallback((index: number) => {
-        setFeatures((prev) => prev.filter((_, i) => i !== index));
-    }, []);
-
-    const removeIngredient = useCallback((index: number) => {
-        setIngredients((prev) => prev.filter((_, i) => i !== index));
-    }, []);
 
     if (initialLoading) {
         return (
@@ -188,7 +167,7 @@ export default function EditProduct({ params }: { params: Params }) {
         );
     }
     return (
-        <div style={{ padding: '24px' }}>
+        <div>
             <Space direction="vertical" style={{ width: '100%' }}>
                 <BackButton text="Quay lại" link="/products" />
                 <Title level={2}>Chỉnh sửa sản phẩm</Title>
@@ -208,35 +187,34 @@ export default function EditProduct({ params }: { params: Params }) {
                             <Input placeholder="Nhập tên sản phẩm" />
                         </Form.Item>
 
-                        <Space style={{ width: '100%' }} direction="horizontal">
-                            <Form.Item
-                                name="price"
-                                label="Giá"
-                                rules={[{ required: true, message: 'Vui lòng nhập giá sản phẩm!' }]}
-                                style={{ width: '50%' }}
-                            >
-                                <InputNumber
-                                    style={{ width: '100%' }}
-                                    placeholder="Nhập giá bán"
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value!.replace(/\$\s?|(,*)/g, '')}
-                                />
-                            </Form.Item>
 
-                            <Form.Item
-                                name="originalPrice"
-                                label="Giá gốc"
-                                rules={[{ required: true, message: 'Vui lòng nhập giá gốc!' }]}
-                                style={{ width: '50%' }}
-                            >
-                                <InputNumber
-                                    style={{ width: '100%' }}
-                                    placeholder="Nhập giá gốc"
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value!.replace(/\$\s?|(,*)/g, '')}
-                                />
-                            </Form.Item>
-                        </Space>
+                        <Form.Item
+                            name="price"
+                            label="Giá"
+                            rules={[{ required: true, message: 'Vui lòng nhập giá sản phẩm!' }]}
+                            style={{ width: '50%' }}
+                        >
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                placeholder="Nhập giá bán"
+                                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={value => value!.replace(/\$\s?|(,*)/g, '')}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="originalPrice"
+                            label="Giá gốc"
+                            rules={[{ required: true, message: 'Vui lòng nhập giá gốc!' }]}
+                            style={{ width: '50%' }}
+                        >
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                placeholder="Nhập giá gốc"
+                                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={value => value!.replace(/\$\s?|(,*)/g, '')}
+                            />
+                        </Form.Item>
 
                         <Form.Item
                             name="category"
@@ -259,58 +237,57 @@ export default function EditProduct({ params }: { params: Params }) {
                         >
                             <TextArea rows={4} placeholder="Nhập mô tả sản phẩm" />
                         </Form.Item>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="weight"
+                                    label="Trọng lượng"
+                                    rules={[{ required: true, message: 'Vui lòng nhập trọng lượng!' }]}
+                                >
+                                    <Input placeholder="Ví dụ: 100g" />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="origin"
+                                    label="Xuất xứ"
+                                    rules={[{ required: true, message: 'Vui lòng nhập xuất xứ!' }]}
+                                >
+                                    <Input placeholder="Ví dụ: Việt Nam" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
 
-                        <Divider orientation="left">Thông tin chi tiết</Divider>
-
-                        <Space style={{ width: '100%' }} direction="horizontal">
-                            <Form.Item
-                                name="weight"
-                                label="Trọng lượng"
-                                rules={[{ required: true, message: 'Vui lòng nhập trọng lượng!' }]}
-                                style={{ width: '50%' }}
-                            >
-                                <Input placeholder="Ví dụ: 100g" />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="origin"
-                                label="Xuất xứ"
-                                rules={[{ required: true, message: 'Vui lòng nhập xuất xứ!' }]}
-                                style={{ width: '50%' }}
-                            >
-                                <Input placeholder="Ví dụ: Việt Nam" />
-                            </Form.Item>
-                        </Space>
-
-                        <Space style={{ width: '100%' }} direction="horizontal">
-                            <Form.Item
-                                name="holdLevel"
-                                label="Độ giữ nếp"
-                                rules={[{ required: true, message: 'Vui lòng nhập độ giữ nếp!' }]}
-                                style={{ width: '50%' }}
-                            >
-                                <Select placeholder="Chọn độ giữ nếp">
-                                    <Select.Option value="weak">Yếu</Select.Option>
-                                    <Select.Option value="medium">Trung bình</Select.Option>
-                                    <Select.Option value="strong">Mạnh</Select.Option>
-                                    <Select.Option value="very_strong">Rất mạnh</Select.Option>
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item
-                                name="shineLevel"
-                                label="Độ bóng"
-                                rules={[{ required: true, message: 'Vui lòng nhập độ bóng!' }]}
-                                style={{ width: '50%' }}
-                            >
-                                <Select placeholder="Chọn độ bóng">
-                                    <Select.Option value="matte">Lì</Select.Option>
-                                    <Select.Option value="low_shine">Ánh nhẹ</Select.Option>
-                                    <Select.Option value="medium_shine">Bóng vừa</Select.Option>
-                                    <Select.Option value="high_shine">Rất bóng</Select.Option>
-                                </Select>
-                            </Form.Item>
-                        </Space>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="holdLevel"
+                                    label="Độ giữ nếp"
+                                    rules={[{ required: true, message: 'Vui lòng nhập độ giữ nếp!' }]}
+                                >
+                                    <Select placeholder="Chọn độ giữ nếp">
+                                        <Select.Option value="weak">Yếu</Select.Option>
+                                        <Select.Option value="medium">Trung bình</Select.Option>
+                                        <Select.Option value="strong">Mạnh</Select.Option>
+                                        <Select.Option value="very_strong">Rất mạnh</Select.Option>
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="shineLevel"
+                                    label="Độ bóng"
+                                    rules={[{ required: true, message: 'Vui lòng nhập độ bóng!' }]}
+                                >
+                                    <Select placeholder="Chọn độ bóng">
+                                        <Select.Option value="matte">Lì</Select.Option>
+                                        <Select.Option value="low_shine">Ánh nhẹ</Select.Option>
+                                        <Select.Option value="medium_shine">Bóng vừa</Select.Option>
+                                        <Select.Option value="high_shine">Rất bóng</Select.Option>
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                        </Row>
 
                         <Form.Item
                             name="expiry"
@@ -323,65 +300,85 @@ export default function EditProduct({ params }: { params: Params }) {
                         <Divider orientation="left">Hình ảnh sản phẩm</Divider>
 
                         <Form.Item
-                            name="gallery"
-                            label="Thư viện ảnh"
+                            name="images"
+                            label="Hình ảnh chính"
                             valuePropName="fileList"
-                            getValueFromEvent={normFile => {
-                                if (Array.isArray(normFile)) {
-                                    return normFile;
-                                }
-                                return normFile?.fileList;
-                            }}
+                            getValueFromEvent={(e) => e.fileList}
                         >
                             <Upload
                                 listType="picture-card"
                                 beforeUpload={beforeUpload}
-                                onChange={handleGalleryChange}
-                                fileList={galleryFileList}
-                                multiple
+                                onChange={handleImageChange}
+                                fileList={fileList}
+                                defaultFileList={fileList} // ✅ Thêm dòng này
+                                multiple={false}
                             >
-                                {galleryFileList.length >= 5 ? null : (
+                                {fileList.length >= 1 ? null : (
                                     <div>
-                                        <PlusOutlined />
+                                        <UploadOutlined />
                                         <div style={{ marginTop: 8 }}>Tải lên</div>
                                     </div>
                                 )}
                             </Upload>
                         </Form.Item>
 
-                        <Divider orientation="left">Đặc điểm nổi bật</Divider>
-                        <Space>
-                            <Input
-                                value={featureInput}
-                                onChange={e => setFeatureInput(e.target.value)}                             
-                                placeholder="Nhập đặc điểm nổi bật"
-                            />
-                            <Button onClick={handleFeatureAdd}>Thêm</Button>
-                        </Space>
-                        <div style={{ marginTop: 10 }}>
-                            {features.map((feature, index) => (
-                                <Tag closable key={index} onClose={() => removeFeature(index)}>
-                                    {feature}
-                                </Tag>
-                            ))}
-                        </div>
+                        <Form.Item
+                            name="gallery"
+                            label="Thư viện hình ảnh"
+                            valuePropName="fileList"
+                            getValueFromEvent={(e) => e.fileList}
+                        >
+                            <Upload
+                                listType="picture-card"
+                                beforeUpload={beforeUpload}
+                                onChange={handleGalleryChange}
+                                fileList={galleryFileList}
+                                defaultFileList={galleryFileList} // ✅ Thêm dòng này
+                                multiple
+                                maxCount={5}
+                            >
+                                {galleryFileList.length >= 5 ? null : (
+                                    <div>
+                                        <UploadOutlined />
+                                        <div style={{ marginTop: 8 }}>Tải lên</div>
+                                    </div>
+                                )}
+                            </Upload>
+                        </Form.Item>
 
-                        <Divider orientation="left">Thành phần</Divider>
-                        <Space>
-                            <Input
-                                value={ingredientInput}
-                                onChange={e => setIngredientInput(e.target.value)}
-                                placeholder="Nhập thành phần"
+
+                        <Form.Item
+                            name="usage"
+                            label="Hướng dẫn sử dụng"
+                            rules={[{ required: true, message: 'Vui lòng nhập hướng dẫn sử dụng!' }]}
+                        >
+                            <Input placeholder="Nhập hướng dẫn sử dụng" />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="features"
+                            label="Tính năng"
+                            rules={[{ required: true, message: 'Vui lòng nhập tính năng sản phẩm!' }]}
+                        >
+                            <TextArea
+                                rows={3}
+                                placeholder="Nhập tính năng sản phẩm"
+                                value={features}
                             />
-                            <Button onClick={handleIngredientAdd}>Thêm</Button>
-                        </Space>
-                        <div style={{ marginTop: 10 }}>
-                            {ingredients.map((ingredient, index) => (
-                                <Tag closable key={index} onClose={() => removeIngredient(index)}>
-                                    {ingredient}
-                                </Tag>
-                            ))}
-                        </div>
+                        </Form.Item>
+
+                        <Form.Item
+                            name="ingredients"
+                            label="Thành phần"
+                            rules={[{ required: true, message: 'Vui lòng nhập thành phần sản phẩm!' }]}
+                        >
+                            <TextArea
+                                rows={3}
+                                placeholder="Nhập thành phần sản phẩm"
+                                value={ingredients}
+                            />
+                        </Form.Item>
+
 
                         <Form.Item>
                             <Button type="primary" htmlType="submit" loading={loading}>
