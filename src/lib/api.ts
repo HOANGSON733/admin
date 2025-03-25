@@ -2,6 +2,7 @@ const API_URL = "http://localhost:5000/gallery"; // Backend NestJS
 const SERVICE_URL = "http://localhost:5000/services"; // Backend cho Service
 const BLOG_URL = "http://localhost:5000/blogs"; // Backend cho Blog
 const PRODUCT_URL = "http://localhost:5000/products"; // Backend cho Product
+const BANNER_URL = "http://localhost:5000/banners" // Bachend cho  Banners
 /** 
  * Lấy danh sách dữ liệu từ API 
  */
@@ -468,3 +469,23 @@ export const uploadImage = async (file: File) => {
         return null;
     }
 };
+
+export const getBanners = async () =>{
+    try {
+        const res = await fetch(BANNER_URL,{cache: "no-store"});
+        if(!res.ok){
+            console.log("Lỗi khi lấy dữ liệu: ", res.status, await res.text);
+            return[]
+        }
+        const json = await res.json();
+
+        if (!json || typeof json !== "object" || Object.keys(json).length === 0) {
+            console.error("Dữ liệu API không hợp lệ:", json);
+            return [];
+        }
+        return Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+    } catch (error) {
+        console.error("Lỗi khi gọi API getData:", error);
+        return [];
+    }
+} 
