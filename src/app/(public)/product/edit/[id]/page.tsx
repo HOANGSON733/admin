@@ -127,9 +127,12 @@ export default function EditProduct({ params }: { params: Params }) {
             Object.entries(values).forEach(([key, value]) => {
                 if (value !== undefined && key !== "images" && key !== "gallery") {
                     formData.append(key, String(value));
+                    console.log("key",key);
+                    
                 }
             });
-
+            console.log("ádffd",values);
+            
             // Add features & ingredients
 
             // Add ảnh chính
@@ -139,7 +142,7 @@ export default function EditProduct({ params }: { params: Params }) {
 
             // Add ảnh gallery
             galleryFileList.forEach((file) => {
-                if (file.originFileObj) formData.append("gallery[]", file.originFileObj);
+                if (file.originFileObj) formData.append("gallery", file.originFileObj);
             });
 
             // Gửi dữ liệu cập nhật
@@ -147,7 +150,8 @@ export default function EditProduct({ params }: { params: Params }) {
             if (!response || response.error) {
                 throw new Error(response?.error || "Có lỗi xảy ra khi cập nhật dữ liệu.");
             }
-
+            console.log("sjhdfdatejks", formData);
+            
             notification.success({ message: "Thành công", description: "Sản phẩm đã được cập nhật thành công." });
             router.push("/products");
         } catch (err: any) {
