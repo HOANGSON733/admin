@@ -20,6 +20,7 @@ import {
   FaImages,
   FaShoppingCart,
 } from "react-icons/fa";
+import { GiVerticalBanner } from "react-icons/gi";
 import Link from "next/link";
 import { cn } from "@/lib/utils"; // Giả sử bạn có utility này từ shadcn/ui
 
@@ -37,6 +38,7 @@ const Sidebar = () => {
     { href: "/products", icon: FaShoppingCart, label: "Product" },
     { href: "/services", icon: FaSmile, label: "Service" },
     { href: "/calculator", icon: FaCalculator, label: "Calculator" },
+    { href: "banner", icon: GiVerticalBanner, label: "Banner" },
   ];
 
   const settingItems: SidebarItem[] = [

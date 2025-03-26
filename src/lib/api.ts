@@ -2,7 +2,6 @@ const API_URL = "http://localhost:5000/gallery"; // Backend NestJS
 const SERVICE_URL = "http://localhost:5000/services"; // Backend cho Service
 const BLOG_URL = "http://localhost:5000/blogs"; // Backend cho Blog
 const PRODUCT_URL = "http://localhost:5000/products"; // Backend cho Product
-const BANNER_URL = "http://localhost:5000/banners" // Bachend cho  Banners
 /** 
  * Lấy danh sách dữ liệu từ API 
  */
@@ -181,15 +180,15 @@ export const postProduct = async (data: FormData) => {
 
         if (!res.ok) {
             // Thử lấy thông tin lỗi chi tiết từ response
-            const errorData = await res.json().catch(() => ({ 
-                message: `Lỗi HTTP ${res.status}: ${res.statusText}` 
+            const errorData = await res.json().catch(() => ({
+                message: `Lỗi HTTP ${res.status}: ${res.statusText}`
             }));
             console.error("Lỗi khi tạo sản phẩm:", errorData);
             return { error: errorData.message || `Lỗi HTTP ${res.status}: ${res.statusText}` };
         }
 
         return await res.json();
-    } catch (error:any) {
+    } catch (error: any) {
         console.error("Lỗi khi post sản phẩm:", error);
         return { error: error.message || "Lỗi không xác định khi gửi dữ liệu" };
     }
@@ -308,9 +307,9 @@ export async function getProductById(id: number) {
 }
 
 export const updateProduct = async (
-    
+
     id: number,
-    data:any
+    data: any
 ) => {
     try {
         const res = await fetch(`http://localhost:5000/products/${id}`, {
@@ -451,23 +450,3 @@ export const uploadImage = async (file: File) => {
         return null;
     }
 };
-
-export const getBanners = async () =>{
-    try {
-        const res = await fetch(BANNER_URL,{cache: "no-store"});
-        if(!res.ok){
-            console.log("Lỗi khi lấy dữ liệu: ", res.status, await res.text);
-            return[]
-        }
-        const json = await res.json();
-
-        if (!json || typeof json !== "object" || Object.keys(json).length === 0) {
-            console.error("Dữ liệu API không hợp lệ:", json);
-            return [];
-        }
-        return Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
-    } catch (error) {
-        console.error("Lỗi khi gọi API getData:", error);
-        return [];
-    }
-} 

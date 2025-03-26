@@ -1,8 +1,10 @@
 // src/components/Banner/BannerList.tsx
+"use client"
 import React, { useEffect, useState } from 'react';
-import { getBanners, deleteBanner } from '@/lib/api/banner';
-import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/components/ui/toast';
+import { getBanners, deleteBanner } from '@/lib/banner';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from 'antd';
+import { notification } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -16,17 +18,20 @@ export interface Banner {
 const BannerList: React.FC = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [api, contextHolder] = notification.useNotification();
+   
+    
   const fetchBanners = async () => {
     try {
       setLoading(true);
       const data = await getBanners();
+      console.log("data",data);
+      
       setBanners(data);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load banners",
-        variant: "destructive",
+      api.error({
+        message: 'Lỗi',
+        description: 'Không thể tải danh sách banner.',
       });
     } finally {
       setLoading(false);
@@ -38,39 +43,39 @@ const BannerList: React.FC = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this banner?")) {
+    if (confirm('Bạn có chắc chắn muốn xóa banner này?')) {
       try {
         await deleteBanner(id);
-        toast({
-          title: "Success",
-          description: "Banner deleted successfully",
+        api.success({
+          message: 'Thành công',
+          description: 'Banner đã được xóa thành công.',
         });
         fetchBanners();
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to delete banner",
-          variant: "destructive",
+        api.error({
+          message: 'Lỗi',
+          description: 'Không thể xóa banner.',
         });
       }
     }
   };
 
   if (loading) {
-    return <div className="flex justify-center p-8">Loading banners...</div>;
+    return <div className="flex justify-center p-8">Đang tải danh sách banner...</div>;
   }
 
   return (
     <div className="container mx-auto p-4">
+      {contextHolder}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Banners</h1>
-        <Link href="/banners/create">
-          <Button>Add New Banner</Button>
+        <Link href="/banner/create">
+          <Button type="primary">Thêm Banner</Button>
         </Link>
       </div>
 
       {banners.length === 0 ? (
-        <p className="text-center text-gray-500">No banners found</p>
+        <p className="text-center text-gray-500">Không có banner nào</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {banners.map((banner) => (
@@ -90,22 +95,24 @@ const BannerList: React.FC = () => {
                   </div>
                 ) : (
                   <div className="bg-gray-100 h-48 w-full flex items-center justify-center">
-                    <p className="text-gray-400">No image</p>
+                    <p className="text-gray-400">Không có hình ảnh</p>
                   </div>
                 )}
               </CardContent>
               <CardFooter className="flex justify-end gap-2 p-4">
-                <Link href={`/banners/edit/${banner.id}`}>
-                  <Button variant="outline" size="sm">
-                    <Pencil className="h-4 w-4 mr-2" /> Edit
+                <Link href={`/banner/edit/${banner.id}`}>
+                  <Button type="default" size="small" icon={<Pencil className="h-4 w-4" />}>
+                    Sửa
                   </Button>
                 </Link>
-                <Button 
-                  variant="destructive" 
-                  size="sm" 
+                <Button
+                  type="primary"
+                  danger
+                  size="small"
+                  icon={<Trash2 className="h-4 w-4" />}
                   onClick={() => handleDelete(banner.id)}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                  Xóa
                 </Button>
               </CardFooter>
             </Card>
