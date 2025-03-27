@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getData, updateData, uploadImage } from "@/lib/api"; // Thêm hàm upload ảnh
+import { notification } from "antd"; // Import notification từ Ant Design
+import { getData, updateData } from "@/lib/api";
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
 
@@ -12,85 +13,78 @@ export default function EditGallery() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [name, setName] = useState("");
     const [title, setTitle] = useState("");
-    const [image, setImage] = useState<string | null>(null); // URL ảnh hiện tại
-    // const [newImage, setNewImage] = useState<File | null>(null); // Ảnh mới
+    const [image, setImage] = useState<string | null>(null);
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
-
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
 
     useEffect(() => {
         if (!id) return;
 
         getData()
             .then((data) => {
-                console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu API trả về
+                console.log("Dữ liệu nhận được:", data);
                 if (data) {
                     setName(data[0].name || "");
                     setTitle(data[0].title || "");
-                    setImage(data[0].image || ""); // Có thể data[0].image bị undefined ở đây
+                    setImage(data[0].image || "");
                     setContent(data[0].content || "");
-                    setCategory(data[0].category || "" );
-                    console.log("Category nhận được:", data.category);
+                    setCategory(data[0].category || "");
                 }
             })
-            .catch((err) => {
-                console.error("Lỗi khi tải dữ liệu:", err);
-                setError("Không thể tải dữ liệu.");
+            .catch(() => {
+                notification.error({
+                    message: "Lỗi tải dữ liệu",
+                    description: "Không thể tải dữ liệu từ máy chủ.",
+                    placement: "topRight",
+                });
             });
-
     }, [id]);
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError("");
-    
+
         try {
             const formData = new FormData();
             formData.append("name", name);
             formData.append("title", title);
             formData.append("content", content);
             formData.append("category", category);
-            
             if (selectedFile) {
-                formData.append("image", selectedFile); // Gửi file lên API
+                formData.append("image", selectedFile);
             }
-    
+
             const response = await fetch(`http://localhost:5000/gallery/${id}`, {
                 method: "PATCH",
-                body: formData, // Gửi form-data thay vì JSON
+                body: formData,
             });
-    
-            const data = await response.json();
-            console.log("Response cập nhật:", data);
-    
-            if (!response.ok) {
-                throw new Error(data.message || "Lỗi khi cập nhật");
-            }
-    
+
+            if (!response.ok) throw new Error("Lỗi khi cập nhật");
+
+            notification.success({
+                message: "Cập nhật thành công",
+                description: "Dữ liệu đã được cập nhật thành công!",
+                placement: "topRight",
+            });
+
             router.push("/");
         } catch (error) {
-            console.error("Lỗi khi cập nhật:", error);
-            setError("Có lỗi xảy ra khi cập nhật.");
+            notification.error({
+                message: "Lỗi cập nhật",
+                description: "Có lỗi xảy ra khi cập nhật dữ liệu.",
+                placement: "topRight",
+            });
         } finally {
             setLoading(false);
         }
     };
-    
-    if (name === null || title === null || content === null || category === null || image === null) {
-        return <p className="text-center">Đang tải dữ liệu...</p>;
-    }
-
 
     return (
         <div>
             <BackButton text="Quay lại" link="/" />
             <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Chỉnh sửa ảnh</h1>
-
-                {error && <p className="text-red-500 text-center">{error}</p>}
 
                 <form onSubmit={handleUpdate} className="space-y-4">
                     <input
@@ -111,15 +105,12 @@ export default function EditGallery() {
                         className="w-full p-2 border border-gray-300 rounded"
                     />
 
-                    {/* Input chọn file ảnh */}
                     <input
                         type="file"
                         onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
 
-
-                    {/* Hiển thị ảnh cũ hoặc ảnh mới nếu chọn */}
                     {image && (
                         <img src={image} alt="Preview" className="w-full h-40 object-cover rounded" />
                     )}
@@ -131,6 +122,7 @@ export default function EditGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+
                     <select
                         value={category || ""}
                         onChange={(e) => setCategory(e.target.value)}

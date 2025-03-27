@@ -80,7 +80,11 @@ export const getBlogs = async () => {
         return [];
     }
 };
-
+export const getBlogById = async (id: any) => {
+    const response = await fetch(`http://localhost:5000/blogs/${id}`);
+    if (!response.ok) throw new Error("Không thể lấy blog");
+    return response.json();
+};
 
 /** 
  * Lấy danh sách sản phẩm từ API

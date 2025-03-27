@@ -55,6 +55,7 @@ export default function EditBlog() {
             formData.append("title", title);
             formData.append("content", content);
             formData.append("description", description);
+            console.log("jhaksdhajl",formData);
             
             if (selectedFile) {
                 formData.append("image", selectedFile); // Gửi file lên API
@@ -95,14 +96,7 @@ export default function EditBlog() {
                 {error && <p className="text-red-500 text-center">{error}</p>}
 
                 <form onSubmit={handleUpdate} className="space-y-4">
-                    <input
-                        type="text"
-                        placeholder="Tên"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
+                    
 
                     <input
                         type="text"
@@ -112,7 +106,14 @@ export default function EditBlog() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-
+                    <input
+                        type="text"
+                        placeholder="Tên"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="w-full p-2 border border-gray-300 rounded"
+                    />
                     {/* Input chọn file ảnh */}
                     <input
                         type="file"

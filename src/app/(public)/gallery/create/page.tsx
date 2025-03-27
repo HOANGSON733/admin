@@ -4,6 +4,7 @@ import { useState } from "react";
 import { postData } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/go-back";
+import { notification } from "antd"; // Import notification từ antd
 
 export default function CreateGallery() {
     const [name, setName] = useState("");
@@ -14,19 +15,28 @@ export default function CreateGallery() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
+    const [previewImage, setPreviewImage] = useState<string | null>(null); // Lưu URL xem trước
+
+    // Hàm hiển thị notification
+    const openNotification = (type: "success" | "error", message: string, description?: string) => {
+        notification[type]({
+            message,
+            description,
+            placement: "topRight", // Vị trí thông báo
+            duration: 3, // Thời gian hiển thị (giây)
+        });
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
 
-        // 🟢 Dùng FormData
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content", content);
         formData.append("category", category);
         formData.append("name", name);
-
         if (image) {
             formData.append("image", image);
         }
@@ -38,25 +48,46 @@ export default function CreateGallery() {
             console.log("Phản hồi từ API:", response);
 
             if (response.error) {
-                setError("Lỗi: " + response.error);
+                // Thay setError bằng notification
+                openNotification("error", "Lỗi", response.error);
             } else {
+                // Thông báo thành công
+                openNotification("success", "Thành công", "Ảnh đã được thêm thành công!");
                 router.push("/");
             }
         } catch (err) {
-            setError("Có lỗi xảy ra khi gửi dữ liệu.");
+            // Thay setError bằng notification
+            openNotification("error", "Lỗi", "Có lỗi xảy ra khi gửi dữ liệu.");
             console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImage(file); // Cập nhật state image
+
+            // Kiểm tra xem FileReader có hoạt động không
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === "string") {
+                    setPreviewImage(event.target.result); // Cập nhật ảnh xem trước
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <div>
             <BackButton text="Back" link="/" />
-            <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+            <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Thêm ảnh mới</h1>
 
-                {error && <p className="text-red-500 text-center">{error}</p>}
+                {/* Bỏ phần hiển thị error cũ */}
+                {/* {error && <p className="text-red-500 text-center">{error}</p>} */}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
@@ -75,18 +106,25 @@ export default function CreateGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                    {/* Sửa input file */}
                     <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                                setImage(e.target.files[0]);
-                            }
-                        }}
+                        onChange={handleImageChange}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+
+                    {previewImage && (
+                        <div className="mt-4">
+                            <p className="text-sm mb-2">Xem trước:</p>
+                            <img
+                                src={previewImage}
+                                alt="Xem trước"
+                                className="object-contain w-full h-40 border rounded"
+                            />
+                        </div>
+                    )}
+
                     <textarea
                         placeholder="Nội dung"
                         value={content}
@@ -100,7 +138,9 @@ export default function CreateGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     >
-                        <option value="" disabled>Chọn danh mục</option>
+                        <option value="" disabled>
+                            Chọn danh mục
+                        </option>
                         <option value="kieu-toc">Kiểu Tóc</option>
                         <option value="dich-vu">Dịch Vụ</option>
                         <option value="toc-nam">Tóc Nam</option>
