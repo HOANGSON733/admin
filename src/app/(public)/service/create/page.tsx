@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import BackButton from "@/components/go-back";
 
 export default function CreateService() {
-
     const [title, setTitle] = useState("");
     const [images, setImages] = useState<File[]>([]);
+    const [previewImages, setPreviewImages] = useState<string[]>([]); // Lưu danh sách URL xem trước
     const [content1, setContent] = useState("");
     const [description1, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
@@ -19,22 +19,18 @@ export default function CreateService() {
         e.preventDefault();
         setLoading(true);
         setError("");
-    
+
         const formData = new FormData();
         formData.append("title", title);
         formData.append("content1", content1);
         formData.append("description1", description1);
-    
-        images.forEach((file, index) => {
-            formData.append(`image`, file);  // Gửi từng ảnh vào form
+
+        images.forEach((file) => {
+            formData.append(`image`, file); // Gửi từng ảnh vào form
         });
-    
-        console.log("Dữ liệu gửi lên API:", Array.from(formData.entries()));
-    
+
         try {
             const response = await postService(formData);
-            console.log("Phản hồi từ API:", response);
-    
             if (response?.error) {
                 setError("Lỗi: " + response.error);
             } else {
@@ -47,7 +43,18 @@ export default function CreateService() {
             setLoading(false);
         }
     };
-    
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            setImages(filesArray); // Lưu danh sách file ảnh
+
+            // Tạo danh sách URL xem trước
+            const previewUrls = filesArray.map((file) => URL.createObjectURL(file));
+            setPreviewImages(previewUrls);
+        }
+    };
+
     return (
         <div>
             <BackButton text="Back" link="/services" />
@@ -65,20 +72,32 @@ export default function CreateService() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                    {/* Sửa input file */}
+
                     <p className="block text-gray-700">Vui Lòng Chọn 2 Ảnh</p>
                     <input
                         type="file"
                         accept="image/*"
-                        multiple  // Cho phép chọn nhiều ảnh
-                        onChange={(e) => {
-                            if (e.target.files) {
-                                setImages(Array.from(e.target.files)); // Chuyển FileList thành mảng
-                            }
-                        }}
+                        multiple
+                        onChange={handleImageChange}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+
+                    {previewImages.length > 0 && (
+                        <div className="mt-4">
+                            <p className="text-sm mb-2">Xem trước:</p>
+                            <div className="grid grid-cols-2 gap-2">
+                                {previewImages.map((src, index) => (
+                                    <img
+                                        key={index}
+                                        src={src}
+                                        alt={`Xem trước ${index + 1}`}
+                                        className="object-cover w-full h-32 border rounded"
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <textarea
                         placeholder="Nội dung"
@@ -94,7 +113,6 @@ export default function CreateService() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-
 
                     <button
                         type="submit"

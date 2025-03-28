@@ -15,6 +15,7 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import History from "@tiptap/extension-history";
 import TextStyle from "@tiptap/extension-text-style"; // ✅ Bắt buộc để dùng Color
 import { useState } from "react";
+import image from "../../public/ava.jpg"
 
 const TiptapEditor = ({ content, setContent }: any) => {
   const [imageUrl, setImageUrl] = useState("");
@@ -35,10 +36,11 @@ const TiptapEditor = ({ content, setContent }: any) => {
       OrderedList,
       ListItem,
     ],
-    content: content || "<p>Nhập nội dung...</p>",
+    content: content ,
     onUpdate: ({ editor }) => setContent(editor.getHTML()),
   });
-
+  console.log("conten1",content);
+  
   if (!editor) return <p>Loading editor...</p>;
 
   return (

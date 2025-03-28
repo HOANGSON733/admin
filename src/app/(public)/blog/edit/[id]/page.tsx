@@ -3,9 +3,10 @@ import dynamic from "next/dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getBlogs, updateBlog, uploadImage } from "@/lib/api"; // Thêm hàm upload ảnh
+import { getBlogs, updateBlog, uploadImage, getBlogById } from "@/lib/api"; // Thêm hàm upload ảnh
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
+import { number } from "zod";
 
 const TiptapEditor = dynamic(() => import("@/components/TiptapEditor"), { ssr: false });
 
@@ -25,16 +26,19 @@ export default function EditBlog() {
 
     useEffect(() => {
         if (!id) return;
-
-        getBlogs()
-            .then((data) => {
+            const idnumber = Number(id)
+        getBlogById(idnumber)
+            .then(({data}) => {
                 console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu API trả về
+                
+                console.log("id",idnumber);
+                
                 if (data) {
-                    setName(data[0].name || "");
-                    setTitle(data[0].title || "");
-                    setImage(data[0].image || ""); // Có thể data[0].image bị undefined ở đây
-                    setContent(data[0].content || "");
-                    setDescription(data[0].description || "" );
+                    setName(data.name || "");
+                    setTitle(data.title || "");
+                    setImage(data.image || ""); // Có thể data[0].image bị undefined ở đây
+                    setContent(data.content || "");
+                    setDescription(data.description || "" );
                 }
             })
             .catch((err) => {
@@ -86,7 +90,8 @@ export default function EditBlog() {
         return <p className="text-center">Đang tải dữ liệu...</p>;
     }
 
-
+    console.log(content);
+    
     return (
         <div>
             <BackButton text="Quay lại" link="/blogs" />
@@ -128,13 +133,14 @@ export default function EditBlog() {
                     )}
                          {/* 🟢 Tiptap Editor */}
                     <TiptapEditor content={content} setContent={setContent} />
-                    {/* <textarea
+                    
+                    <textarea
                         placeholder="Nội dung"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         required
                         className="w-full p-2 border border-gray-300 rounded"
-                    /> */}
+                    />
                     <textarea
                         placeholder="Mô tả"
                         value={description}

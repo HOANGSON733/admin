@@ -94,7 +94,7 @@ export default function BlogList() {
                                         <TableHead className="text-center">Image</TableHead>
                                         <TableHead>Name</TableHead>
                                         <TableHead>Title</TableHead>
-                                        <TableHead>Content</TableHead>
+                                        {/* <TableHead>Content</TableHead> */}
                                         <TableHead>Descripton</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
@@ -113,13 +113,13 @@ export default function BlogList() {
                                             </TableCell>
                                             <TableCell>{item.name}</TableCell>
                                             <TableCell>{item.title}</TableCell>
-                                            <TableCell>
-                                             <div dangerouslySetInnerHTML={{ __html: item.content }} />
+                                            {/* <TableCell> */}
+                                             {/* <div dangerouslySetInnerHTML={{ __html: item.content }} className="max-w-32 max-h-32"  /> */}
                                                 {/* <TextArea
                                                     value={item.content}
                                                     rows={3} /> */}
 
-                                            </TableCell>
+                                            {/* </TableCell> */}
                                             <TableCell>
                                                 <TextArea
                                                     value={item.description}

@@ -194,7 +194,7 @@ export default function EditService() {
                 <button
                   type="button"
                   onClick={handleCancelUpload}
-                  className="text-sm text-red-500 hover:text-red-700"
+                  className="text-sm text-blue-500 hover:text-red-700"
                 >
                   Hủy
                 </button>
