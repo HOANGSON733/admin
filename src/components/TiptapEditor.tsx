@@ -15,7 +15,10 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import History from "@tiptap/extension-history";
 import TextStyle from "@tiptap/extension-text-style"; // ✅ Bắt buộc để dùng Color
 import { useState } from "react";
-
+import { FiAlignLeft, FiAlignJustify, FiAlignRight } from "react-icons/fi";
+import { PiArrowUDownRightBold, PiArrowUDownLeftBold } from "react-icons/pi";
+import { Bs1SquareFill, Bs2SquareFill, Bs3SquareFill } from "react-icons/bs";
+import { BsTypeH1,BsTypeH2,BsTypeH3 } from "react-icons/bs";
 const TiptapEditor = ({ content, setContent }: any) => {
   const [imageUrl, setImageUrl] = useState("");
 
@@ -52,34 +55,40 @@ const TiptapEditor = ({ content, setContent }: any) => {
           <em>I</em>
         </button>
         <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className="p-1 border rounded">
-          H1
+          <BsTypeH1 />
         </button>
         <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className="p-1 border rounded">
-          H2
+        <BsTypeH2 />
         </button>
         <button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className="p-1 border rounded">
-          H3
+        <BsTypeH3/>
         </button>
         <button onClick={() => editor.chain().focus().setTextAlign("left").run()} className="p-1 border rounded">
-          ⬅️
+          <FiAlignLeft />
         </button>
         <button onClick={() => editor.chain().focus().setTextAlign("center").run()} className="p-1 border rounded">
-          ⏺
+          <FiAlignJustify />
         </button>
         <button onClick={() => editor.chain().focus().setTextAlign("right").run()} className="p-1 border rounded">
-          ➡️
+          <FiAlignRight />
         </button>
         <button onClick={() => editor.chain().focus().toggleBulletList().run()} className="p-1 border rounded">
           •••
         </button>
-        <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className="p-1 border rounded">
-          1️⃣ 2️⃣ 3️⃣
+        <button
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className="p-1 border rounded flex items-center gap-1 hover:bg-gray-100"
+          title="Toggle Ordered List"
+        >
+          <Bs1SquareFill className="text-blue-500" />
+          <Bs2SquareFill className="text-green-500" />
+          <Bs3SquareFill className="text-red-500" />
         </button>
         <button onClick={() => editor.chain().focus().undo().run()} className="p-1 border rounded">
-          ↩️ Undo
+          <PiArrowUDownLeftBold />
         </button>
         <button onClick={() => editor.chain().focus().redo().run()} className="p-1 border rounded">
-          ↪️ Redo
+          <PiArrowUDownRightBold />
         </button>
 
         {/* Nút chọn màu chữ */}

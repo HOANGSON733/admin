@@ -28,6 +28,24 @@ export const getData = async () => {
     }
 };
 
+export const getDataById = async ({ idnumber }: { idnumber: number }) => {
+    try {
+        const response = await fetch(`http://localhost:5000/gallery/${idnumber}`);
+        
+        if (!response.ok) {
+            throw new Error('Không thể tải dữ liệu');
+        }
+        
+        const data = await response.json();
+        console.log("Chi tiết dữ liệu:", data); // Log chi tiết để kiểm tra
+        
+        return data;
+    } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+        return null;
+    }
+};
+
 /** 
  * Lấy danh sách dịch vụ từ API
  */
@@ -85,6 +103,8 @@ export const getBlogById = async (id: any) => {
     if (!response.ok) throw new Error("Không thể lấy blog");
     return response.json();
 };
+
+
 
 /** 
  * Lấy danh sách sản phẩm từ API
