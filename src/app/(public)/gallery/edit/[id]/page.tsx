@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { notification } from "antd"; // Import notification từ Ant Design
-import { getData, updateData } from "@/lib/api";
+import { getData, getDataById, updateData } from "@/lib/api";
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
 
@@ -20,16 +20,16 @@ export default function EditGallery() {
 
     useEffect(() => {
         if (!id) return;
-
-        getData()
+        const idnumber = Number(id);
+        getDataById({idnumber})
             .then((data) => {
                 console.log("Dữ liệu nhận được:", data);
                 if (data) {
-                    setName(data[0].name || "");
-                    setTitle(data[0].title || "");
-                    setImage(data[0].image || "");
-                    setContent(data[0].content || "");
-                    setCategory(data[0].category || "");
+                    setName(data.name || "");
+                    setTitle(data.title || "");
+                    setImage(data.image || "");
+                    setContent(data.content || "");
+                    setCategory(data.category || "");
                 }
             })
             .catch(() => {
@@ -83,7 +83,7 @@ export default function EditGallery() {
     return (
         <div>
             <BackButton text="Quay lại" link="/" />
-            <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+            <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Chỉnh sửa ảnh</h1>
 
                 <form onSubmit={handleUpdate} className="space-y-4">
