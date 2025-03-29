@@ -16,7 +16,6 @@ import {
     Divider,
     Card,
     notification,
-    Tag,
     Row,
     Col
 } from 'antd';
@@ -326,7 +325,7 @@ export default function CreateProduct() {
 
                         <Form.Item
                             name="features"
-                            label="Tính năng"
+                            label="Đặc điểm nổi bật"
                             rules={[{ required: true, message: 'Vui lòng nhập tính năng sản phẩm!' }]}
                         >
                             <TextArea

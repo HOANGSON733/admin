@@ -15,15 +15,10 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import History from "@tiptap/extension-history";
 import TextStyle from "@tiptap/extension-text-style"; // ✅ Bắt buộc để dùng Color
 import { useState } from "react";
-<<<<<<< HEAD
-import image from "../../public/ava.jpg"
-
-=======
 import { FiAlignLeft, FiAlignJustify, FiAlignRight } from "react-icons/fi";
 import { PiArrowUDownRightBold, PiArrowUDownLeftBold } from "react-icons/pi";
 import { Bs1SquareFill, Bs2SquareFill, Bs3SquareFill } from "react-icons/bs";
 import { BsTypeH1,BsTypeH2,BsTypeH3 } from "react-icons/bs";
->>>>>>> faa7c03d277d18a3d696f00354c83a483dbda209
 const TiptapEditor = ({ content, setContent }: any) => {
   const [imageUrl, setImageUrl] = useState("");
 

@@ -20,19 +20,30 @@ export default function EditGallery() {
 
     useEffect(() => {
         if (!id) return;
+    
         const idnumber = Number(id);
-        getDataById({idnumber})
-            .then((data) => {
-                console.log("Dữ liệu nhận được:", data);
+        if (isNaN(idnumber)) {
+            notification.error({
+                message: "Lỗi",
+                description: "ID không hợp lệ.",
+                placement: "topRight",
+            });
+            return;
+        }
+    
+        getDataById({ idnumber })
+            .then(({data}) => {
+                console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu ở đây
                 if (data) {
                     setName(data.name || "");
                     setTitle(data.title || "");
-                    setImage(data.image || "");
+                    setImage(data.image ? `http://localhost:5000/${data.image}` : null);
                     setContent(data.content || "");
                     setCategory(data.category || "");
                 }
             })
-            .catch(() => {
+            .catch((error) => {
+                console.error("Lỗi khi gọi API:", error);
                 notification.error({
                     message: "Lỗi tải dữ liệu",
                     description: "Không thể tải dữ liệu từ máy chủ.",

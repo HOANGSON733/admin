@@ -36,7 +36,7 @@ export default function EditBlog() {
                 if (data) {
                     setName(data.name || "");
                     setTitle(data.title || "");
-                    setImage(data.image || ""); // Có thể data[0].image bị undefined ở đây
+                    setImage(data.image || ""); 
                     setContent(data.content || "");
                     setDescription(data.description || "" );
                 }
@@ -59,7 +59,7 @@ export default function EditBlog() {
             formData.append("title", title);
             formData.append("content", content);
             formData.append("description", description);
-            console.log("jhaksdhajl",formData);
+            console.log("formdata",formData);
             
             if (selectedFile) {
                 formData.append("image", selectedFile); // Gửi file lên API

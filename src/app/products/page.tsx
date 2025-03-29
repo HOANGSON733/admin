@@ -86,22 +86,22 @@ export default function ProductList() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>ID</TableHead>
-                                        <TableHead className="text-center">Image</TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead>Original Price</TableHead>
-                                        <TableHead>Gallery</TableHead>
-                                        <TableHead>Category</TableHead>
-                                        <TableHead>Features</TableHead>
-                                        <TableHead className="w-2xl">Description</TableHead>
-                                        <TableHead>Origin</TableHead>
-                                        <TableHead>Hold Level</TableHead>
-                                        <TableHead>Shine Level</TableHead>
-                                        <TableHead>Ingredients</TableHead>
-                                        <TableHead>Expiry</TableHead>
-                                        <TableHead>Usage</TableHead>
-                                        <TableHead>Slug</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead className="text-center">Hình ảnh</TableHead>
+                                        <TableHead>Tên</TableHead>
+                                        <TableHead>Giá</TableHead>
+                                        <TableHead>Giá gốc</TableHead>
+                                        <TableHead>Thư viện ảnh</TableHead>
+                                        <TableHead>Danh mục</TableHead>
+                                        <TableHead>Đặc điểm nổi bật</TableHead>
+                                        <TableHead className="w-2xl">Mô tả</TableHead>
+                                        <TableHead>Xuất xứ</TableHead>
+                                        <TableHead>Độ dữ nếp</TableHead>
+                                        <TableHead>Độ Bóng</TableHead>
+                                        <TableHead>Thành phần</TableHead>
+                                        <TableHead>Hạn sử dụng</TableHead>
+                                        <TableHead>Hướng dẫn sử dụng</TableHead>
+                                        <TableHead>(Slug)</TableHead>
+                                        <TableHead className="text-right">Hành động</TableHead>
                                     </TableRow>
                                 </TableHeader>
 
@@ -152,9 +152,8 @@ export default function ProductList() {
                                             </TableCell>
                                             <TableCell>{item.category}</TableCell>
                                             <TableCell>{item.features}</TableCell>
-                                            <TableCell className="w-[300px]">
+                                            <TableCell className="min-w-[300px] max-w-[500px]">
                                                 <TextArea
-
                                                     value={item.description}
                                                     rows={3}
                                                     readOnly
