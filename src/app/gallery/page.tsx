@@ -10,6 +10,7 @@ import { FaPencil } from "react-icons/fa6";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { Textarea } from "@/components/ui/textarea";
 import TextArea from "antd/es/input/TextArea";
+import { date } from "zod";
 
 export default function GalleryList() {
   const [galleries, setGalleries] = useState<any[]>([]);
@@ -22,6 +23,8 @@ export default function GalleryList() {
     const fetchData = async () => {
       try {
         const data = await getData();
+    console.log("galey",data);
+
         setGalleries(data);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
@@ -30,6 +33,7 @@ export default function GalleryList() {
       }
     };
     fetchData();
+    
   }, []);
 
   const handleDelete = async (id: number) => {
@@ -93,6 +97,7 @@ export default function GalleryList() {
                     <TableHead>Name</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Danh mục ảnh</TableHead>
                     <TableHead>Content</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -116,6 +121,7 @@ export default function GalleryList() {
                           {item.category}
                         </span>
                       </TableCell>
+                      <TableCell>{item.category1}</TableCell>
                       <TableCell>
                       <TextArea
                       value={item.content}

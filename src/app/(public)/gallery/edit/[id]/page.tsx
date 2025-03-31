@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { notification } from "antd"; // Import notification từ Ant Design
-import { getData, getDataById, updateData } from "@/lib/api";
+import { getDataById } from "@/lib/api";
 import BackButton from "@/components/go-back";
 import { Button } from "@/components/ui/button";
 
@@ -16,11 +16,13 @@ export default function EditGallery() {
     const [image, setImage] = useState<string | null>(null);
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
+    const [category1, setCategory1] = useState("");
     const [loading, setLoading] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string | null>(null); // Xem trước ảnh
 
     useEffect(() => {
         if (!id) return;
-    
+
         const idnumber = Number(id);
         if (isNaN(idnumber)) {
             notification.error({
@@ -30,16 +32,17 @@ export default function EditGallery() {
             });
             return;
         }
-    
+
         getDataById({ idnumber })
-            .then(({data}) => {
-                console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu ở đây
+            .then(({ data }) => {
+                console.log("Dữ liệu nhận được:", data); // Kiểm tra dữ liệu
                 if (data) {
                     setName(data.name || "");
                     setTitle(data.title || "");
-                    setImage(data.image ? `http://localhost:5000/${data.image}` : null);
+                    setImage(data.image || null);
                     setContent(data.content || "");
                     setCategory(data.category || "");
+                    setCategory1(data.category1 || "");
                 }
             })
             .catch((error) => {
@@ -62,6 +65,7 @@ export default function EditGallery() {
             formData.append("title", title);
             formData.append("content", content);
             formData.append("category", category);
+            formData.append("category1", category1);
             if (selectedFile) {
                 formData.append("image", selectedFile);
             }
@@ -79,7 +83,7 @@ export default function EditGallery() {
                 placement: "topRight",
             });
 
-            router.push("/");
+            router.push("/gallery");
         } catch (error) {
             notification.error({
                 message: "Lỗi cập nhật",
@@ -91,9 +95,25 @@ export default function EditGallery() {
         }
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setSelectedFile(file); // Cập nhật file
+
+            // Đọc file và tạo URL để xem trước
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === "string") {
+                    setPreviewImage(event.target.result); // Hiển thị ảnh mới
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <div>
-            <BackButton text="Quay lại" link="/" />
+            <BackButton text="Quay lại" link="/gallery" />
             <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Chỉnh sửa ảnh</h1>
 
@@ -118,12 +138,29 @@ export default function EditGallery() {
 
                     <input
                         type="file"
-                        onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                        onChange={handleImageChange}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
 
-                    {image && (
-                        <img src={image} alt="Preview" className="w-full h-40 object-cover rounded" />
+                    {/* Nếu có ảnh mới từ input, hiển thị nó */}
+                    {previewImage ? (
+                        <div className="mt-4">
+                            <p className="text-sm mb-2">Xem trước:</p>
+                            <img
+                                src={previewImage}
+                                alt="Xem trước"
+                                className="object-contain w-full h-40 border rounded"
+                            />
+                        </div>
+                    ) : (
+                        // Nếu không có ảnh mới, hiển thị ảnh từ API
+                        image && (
+                            <img
+                                src={image}
+                                alt="Ảnh hiện tại"
+                                className="w-full h-40 object-cover rounded"
+                            />
+                        )
                     )}
 
                     <textarea
@@ -133,6 +170,20 @@ export default function EditGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+
+                    <select
+                        value={category1}
+                        onChange={(e) => setCategory1(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded"
+                    >
+                        <option value="" disabled>
+                            Kiểu Tóc Dịch Vụ Tóc Nam Phun Xăm Thẩm Mỹ
+                        </option>
+                        <option value="kieu-toc-nam">Kiểu Tóc Nam</option>
+                        <option value="kieu-toc-nu">Kiểu tóc nữ</option>
+                        <option value="phun-xam-tham-my">Phun Xăm Thẩm Mỹ</option>
+                        <option value="nail">Nail</option>
+                    </select>
 
                     <select
                         value={category || ""}

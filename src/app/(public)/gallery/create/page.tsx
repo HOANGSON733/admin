@@ -12,6 +12,7 @@ export default function CreateGallery() {
     const [image, setImage] = useState<File | null>(null);
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
+    const [category1, setCategory1] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
@@ -36,6 +37,7 @@ export default function CreateGallery() {
         formData.append("title", title);
         formData.append("content", content);
         formData.append("category", category);
+        formData.append("category1", category1);
         formData.append("name", name);
         if (image) {
             formData.append("image", image);
@@ -53,7 +55,7 @@ export default function CreateGallery() {
             } else {
                 // Thông báo thành công
                 openNotification("success", "Thành công", "Ảnh đã được thêm thành công!");
-                router.push("/");
+                router.push("/gallery"); // Chuyển hướng về trang gallery
             }
         } catch (err) {
             // Thay setError bằng notification
@@ -82,7 +84,7 @@ export default function CreateGallery() {
 
     return (
         <div>
-            <BackButton text="Back" link="/" />
+            <BackButton text="Back" link="/gallery" />
             <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
                 <h1 className="text-xl font-bold mb-4 text-center">Thêm ảnh mới</h1>
 
@@ -132,10 +134,24 @@ export default function CreateGallery() {
                         required
                         className="w-full p-2 border border-gray-300 rounded"
                     />
+                     <select
+                        value={category1}
+                        onChange={(e) => setCategory1(e.target.value)}
+                        // required
+                        className="w-full p-2 border border-gray-300 rounded"
+                    >
+                        <option value="" disabled>
+                            Kiểu Tóc Dịch Vụ Tóc Nam Phun Xăm Thẩm Mỹ
+                        </option>
+                        <option value="kieu-toc-nam">Kiểu Tóc Nam</option>
+                        <option value="kieu-toc-nu">Kiểu tóc nữ</option>
+                        <option value="phun-xam-tham-my">Phun Xăm Thẩm Mỹ</option>
+                        <option value="nail">Nail</option>
+                    </select>
                     <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        required
+                        // required
                         className="w-full p-2 border border-gray-300 rounded"
                     >
                         <option value="" disabled>
